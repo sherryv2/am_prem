@@ -3,209 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM Premium Activator</title>
+    <title>AM.PREMIUM // ACTIVATOR</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        /* Menggunakan font typography yang kuat dan clean */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap');
 
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --danger: #ef4444;
-            --success: #10b981;
-            --border: #334155;
+            --bg: #0a0a0a;
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --border: #333333;
+            --accent: #ffffff;
+            --error: #ff4a4a;
+            --success: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             color: var(--text-main);
-            margin: 0;
-            padding: 20px;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
             align-items: flex-start;
-            padding-top: 5vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0 0 8px 0;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .step-badge {
-            display: inline-block;
-            background-color: rgba(99, 102, 241, 0.1);
-            color: #818cf8;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-        }
-
-        .card h2 {
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-
-        .card p.desc {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 20px;
+            min-height: 100vh;
+            padding: 10vh 24px;
             line-height: 1.5;
+            overflow-x: hidden;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        input[type="text"], input[type="email"] {
+        .container {
             width: 100%;
-            background-color: #0f172a;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 14px;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: all 0.2s;
+            max-width: 480px;
+        }
+
+        /* Teks Typographic Header */
+        header {
+            margin-bottom: 3rem;
+            animation: fadeDown 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Step Section */
+        .step {
+            margin-bottom: 3rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .step-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--text-main);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* Floating Label Input Interaktif */
+        .input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            padding: 12px 0;
+            outline: none;
+            transition: border-color 0.3s ease;
         }
 
         input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            border-bottom-color: var(--accent);
         }
 
+        label {
+            position: absolute;
+            left: 0;
+            top: 12px;
+            color: var(--text-dim);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all;
+        }
+
+        /* Ketika input fokus atau sudah diisi, label naik ke atas */
+        input:focus ~ label,
+        input:valid ~ label,
+        input:not(:placeholder-shown) ~ label {
+            top: -12px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Button Clean & Brutalist */
         button {
             width: 100%;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
+            background-color: var(--text-main);
+            color: var(--bg);
+            border: 1px solid var(--text-main);
+            padding: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
             font-weight: 600;
-            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background-color: var(--primary-hover);
+            background-color: transparent;
+            color: var(--text-main);
         }
 
         button:disabled {
-            background-color: #475569;
-            color: #94a3b8;
+            background-color: transparent;
+            color: var(--text-dim);
+            border-color: var(--border);
             cursor: not-allowed;
         }
 
-        .message-box {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
+        /* Feedback Status */
+        .status-msg {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-family: 'Space Grotesk', sans-serif;
             display: none;
-            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
 
-        .msg-success {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+        .status-msg.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .msg-error {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+        .msg-error { color: var(--error); }
+        .msg-success { color: var(--success); }
+
+        @keyframes fadeDown {
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">
-            <h1>AM Premium</h1>
-            <p>Aktivasi akun Alight Motion kamu sekarang</p>
-        </div>
+    <div class="container">
+        <header>
+            <h1>AM.PREMIUM</h1>
+            <p class="subtitle">System Activator // v2.0</p>
+        </header>
 
-        <div class="card">
-            <span class="step-badge">Langkah 1</span>
-            <h2>Kirim Link Login</h2>
-            <p class="desc">Masukkan email akun kamu. Kami akan mengirimkan link verifikasi dari Firebase.</p>
+        <!-- Langkah 1 -->
+        <div class="step" id="step1">
+            <div class="step-header">
+                <span class="step-num">1</span>
+                <h2 class="step-title">Authentication Link</h2>
+            </div>
             
             <form id="formSend">
-                <div class="form-group">
-                    <input type="email" id="sendEmail" placeholder="Masukkan alamat email..." required>
+                <div class="input-group">
+                    <!-- placeholder=" " diperlukan agar pseudo-class :placeholder-shown berfungsi untuk logika label -->
+                    <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
+                    <label>Alamat Email</label>
                 </div>
-                <button type="submit" id="btnSend">Kirim Email Verifikasi</button>
+                <button type="submit" id="btnSend">Request Link</button>
+                <div id="resSend" class="status-msg"></div>
             </form>
-            <div id="resSend" class="message-box"></div>
         </div>
 
-        <div class="card">
-            <span class="step-badge">Langkah 2</span>
-            <h2>Aktivasi Premium</h2>
-            <p class="desc">Cek inbox email kamu, salin link login yang masuk, lalu tempel (paste) di bawah ini.</p>
+        <!-- Langkah 2 (Awalnya dibuat pudar/disabled) -->
+        <div class="step disabled" id="step2">
+            <div class="step-header">
+                <span class="step-num">2</span>
+                <h2 class="step-title">Verify & Inject</h2>
+            </div>
             
             <form id="formVerif">
-                <div class="form-group">
-                    <input type="email" id="verifEmail" placeholder="Email kamu tadi..." required>
+                <div class="input-group">
+                    <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
+                    <label>Email Terdaftar</label>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="verifLink" placeholder="Paste link dari email (https://...)" required>
+                <div class="input-group">
+                    <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
+                    <label>Paste Verification Link</label>
                 </div>
-                <button type="submit" id="btnVerif">Proses Aktivasi</button>
+                <button type="submit" id="btnVerif">Inject Premium</button>
+                <div id="resVerif" class="status-msg"></div>
             </form>
-            <div id="resVerif" class="message-box"></div>
         </div>
     </div>
 
     <script>
-        function showMessage(elementId, text, isError = false) {
+        function showStatus(elementId, text, isError = false) {
             const el = document.getElementById(elementId);
-            el.style.display = "block";
-            el.className = `message-box ${isError ? 'msg-error' : 'msg-success'}`;
-            el.textContent = text;
+            el.className = `status-msg show ${isError ? 'msg-error' : 'msg-success'}`;
+            // Format log ala terminal
+            el.innerHTML = isError ? `[ERROR] ${text}` : `[OK] ${text}`;
         }
 
-        // Handle Langkah 1: Kirim Email
+        // Handle Langkah 1
         document.getElementById('formSend').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('sendEmail').value;
@@ -213,31 +266,39 @@
             const resArea = 'resSend';
 
             btn.disabled = true;
-            btn.textContent = "Memproses...";
-            document.getElementById(resArea).style.display = "none";
+            btn.textContent = "PROCESSING...";
+            document.getElementById(resArea).classList.remove('show');
 
             try {
-                // Fetch langsung ke path Vercel (CORS dihandle oleh vercel.json)
+                // Fetch Vercel API path
                 const targetUrl = `/api/am/sendv2?email=${encodeURIComponent(email)}`;
                 const response = await fetch(targetUrl);
-                
                 const result = await response.json();
                 
-                if (!response.ok) throw new Error(result.message || "Gagal menghubungi server API.");
+                if (!response.ok) throw new Error(result.message || "Gagal menghubungi server.");
                 
-                showMessage(resArea, result.message || "Berhasil! Silakan cek email kamu sekarang.");
+                showStatus(resArea, "Link dikirim. Silakan cek inbox email kamu.");
+                btn.textContent = "REQUEST SENT";
                 
-                // Auto-isi email di form langkah 2
-                document.getElementById('verifEmail').value = email;
+                // Interaksi: Buka gembok langkah 2
+                setTimeout(() => {
+                    const step2 = document.getElementById('step2');
+                    step2.classList.remove('disabled');
+                    document.getElementById('verifEmail').value = email;
+                    document.getElementById('verifLink').focus();
+                    
+                    // Scroll halus ke langkah 2
+                    step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 800);
+
             } catch (error) {
-                showMessage(resArea, "Error: " + error.message, true);
-            } finally {
+                showStatus(resArea, error.message, true);
                 btn.disabled = false;
-                btn.textContent = "Kirim Email Verifikasi";
+                btn.textContent = "REQUEST LINK";
             }
         });
 
-        // Handle Langkah 2: Verifikasi Link
+        // Handle Langkah 2
         document.getElementById('formVerif').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('verifEmail').value;
@@ -246,24 +307,24 @@
             const resArea = 'resVerif';
 
             btn.disabled = true;
-            btn.textContent = "Memverifikasi...";
-            document.getElementById(resArea).style.display = "none";
+            btn.textContent = "INJECTING...";
+            document.getElementById(resArea).classList.remove('show');
 
             try {
-                // Fetch langsung ke path Vercel
                 const targetUrl = `/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
                 const response = await fetch(targetUrl);
-                
                 const result = await response.json();
 
-                if (!response.ok) throw new Error(result.message || "Gagal menghubungi server API.");
+                if (!response.ok) throw new Error(result.message || "Verifikasi gagal.");
                 
-                showMessage(resArea, result.message || "Aktivasi Sukses! Premium berhasil diaplikasikan.");
+                showStatus(resArea, "Aktivasi sukses. Akun Premium siap digunakan.");
+                btn.textContent = "SUCCESS";
+                btn.style.backgroundColor = "#fff";
+                btn.style.color = "#000";
             } catch (error) {
-                showMessage(resArea, "Error: " + error.message, true);
-            } finally {
+                showStatus(resArea, error.message, true);
                 btn.disabled = false;
-                btn.textContent = "Proses Aktivasi";
+                btn.textContent = "INJECT PREMIUM";
             }
         });
     </script>
