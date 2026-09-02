@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AM.PREMIUM // ACTIVATOR</title>
     <style>
-        /* Menggunakan font typography yang kuat dan clean */
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap');
 
         :root {
@@ -27,12 +26,15 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
+            /* Tambahan: Grid tipis ala blueprint/terminal */
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 24px 24px;
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 10vh 24px;
+            padding: 8vh 24px;
             line-height: 1.5;
             overflow-x: hidden;
         }
@@ -40,9 +42,19 @@
         .container {
             width: 100%;
             max-width: 480px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Teks Typographic Header */
+        /* Container background biar text tetep kebaca di atas grid */
+        .content-wrapper {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(4px);
+            padding: 2rem;
+            border-radius: 4px;
+            border: 1px solid rgba(51, 51, 51, 0.5);
+        }
+
         header {
             margin-bottom: 3rem;
             animation: fadeDown 0.8s ease-out forwards;
@@ -67,7 +79,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* Step Section */
         .step {
             margin-bottom: 3rem;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,7 +116,6 @@
             letter-spacing: -0.02em;
         }
 
-        /* Floating Label Input Interaktif */
         .input-group {
             position: relative;
             margin-bottom: 2rem;
@@ -138,7 +148,6 @@
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all;
         }
 
-        /* Ketika input fokus atau sudah diisi, label naik ke atas */
         input:focus ~ label,
         input:valid ~ label,
         input:not(:placeholder-shown) ~ label {
@@ -149,7 +158,6 @@
             text-transform: uppercase;
         }
 
-        /* Button Clean & Brutalist */
         button {
             width: 100%;
             background-color: var(--text-main);
@@ -163,6 +171,8 @@
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
@@ -177,15 +187,26 @@
             cursor: not-allowed;
         }
 
-        /* Feedback Status */
+        /* Tambahan: Animasi loading pada button */
+        button.loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; border-color: var(--border); }
+            50% { opacity: 0.5; border-color: var(--text-dim); }
+            100% { opacity: 1; border-color: var(--border); }
+        }
+
         .status-msg {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             font-size: 0.85rem;
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Space Grotesk', monospace;
             display: none;
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.3s ease;
+            min-height: 20px;
         }
 
         .status-msg.show {
@@ -197,6 +218,36 @@
         .msg-error { color: var(--error); }
         .msg-success { color: var(--success); }
 
+        /* Tambahan: Blinking cursor untuk efek ngetik */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: currentColor;
+            vertical-align: middle;
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Tambahan: Minimalist Footer */
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            border-top: 1px dashed var(--border);
+            padding-top: 2rem;
+            letter-spacing: 0.05em;
+        }
+        
+        footer span {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
         @keyframes fadeDown {
             to { opacity: 1; transform: translateY(0); }
         }
@@ -205,57 +256,77 @@
 <body>
 
     <div class="container">
-        <header>
-            <h1>AM.PREMIUM</h1>
-            <p class="subtitle">Developed by Adam // 1.0 </p>
-        </header>
+        <div class="content-wrapper">
+            <header>
+                <h1>AM.PREMIUM</h1>
+                <p class="subtitle">Developed by Adam // 1.0 </p>
+            </header>
 
-        <!-- Langkah 1 -->
-        <div class="step" id="step1">
-            <div class="step-header">
-                <span class="step-num">1</span>
-                <h2 class="step-title">Authentication Link</h2>
-            </div>
-            
-            <form id="formSend">
-                <div class="input-group">
-                    <!-- placeholder=" " diperlukan agar pseudo-class :placeholder-shown berfungsi untuk logika label -->
-                    <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
-                    <label>Alamat Email</label>
+            <div class="step" id="step1">
+                <div class="step-header">
+                    <span class="step-num">1</span>
+                    <h2 class="step-title">Authentication Link</h2>
                 </div>
-                <button type="submit" id="btnSend">Request Link</button>
-                <div id="resSend" class="status-msg"></div>
-            </form>
-        </div>
+                
+                <form id="formSend">
+                    <div class="input-group">
+                        <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
+                        <label>Alamat Email</label>
+                    </div>
+                    <button type="submit" id="btnSend">Request Link</button>
+                    <div id="resSend" class="status-msg"></div>
+                </form>
+            </div>
 
-        <!-- Langkah 2 (Awalnya dibuat pudar/disabled) -->
-        <div class="step disabled" id="step2">
-            <div class="step-header">
-                <span class="step-num">2</span>
-                <h2 class="step-title">Verify & Inject</h2>
+            <div class="step disabled" id="step2">
+                <div class="step-header">
+                    <span class="step-num">2</span>
+                    <h2 class="step-title">Verify & Inject</h2>
+                </div>
+                
+                <form id="formVerif">
+                    <div class="input-group">
+                        <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
+                        <label>Email Terdaftar</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
+                        <label>Paste Verification Link</label>
+                    </div>
+                    <button type="submit" id="btnVerif">Inject Premium</button>
+                    <div id="resVerif" class="status-msg"></div>
+                </form>
             </div>
-            
-            <form id="formVerif">
-                <div class="input-group">
-                    <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
-                    <label>Email Terdaftar</label>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
-                    <label>Paste Verification Link</label>
-                </div>
-                <button type="submit" id="btnVerif">Inject Premium</button>
-                <div id="resVerif" class="status-msg"></div>
-            </form>
+
+            <footer>
+                <p>SECURE INJECTION SYSTEM &copy; 2026</p>
+                <p>ACCESS LEVEL: <span>ROOT</span> // DEV: <span>ADAM</span></p>
+            </footer>
         </div>
     </div>
 
     <script>
-        function showStatus(elementId, text, isError = false) {
+        // Fungsi tambahan: Efek Ngetik (Typewriter)
+        function typeWriterEffect(elementId, text, isError) {
             const el = document.getElementById(elementId);
             el.className = `status-msg show ${isError ? 'msg-error' : 'msg-success'}`;
-            // Format log ala terminal
-            el.innerHTML = isError ? `[ERROR] ${text}` : `[OK] ${text}`;
+            el.innerHTML = ''; // Kosongkan dulu
+            
+            const prefix = isError ? '[ERROR] ' : '[OK] ';
+            const fullText = prefix + text;
+            let i = 0;
+
+            function type() {
+                if (i < fullText.length) {
+                    el.innerHTML = fullText.substring(0, i + 1) + '<span class="cursor"></span>';
+                    i++;
+                    setTimeout(type, 30); // Kecepatan ngetik
+                } else {
+                    // Berhenti ngetik, biarkan cursor kedip bentar trus ilangin
+                    el.innerHTML = fullText + '<span class="cursor" style="animation: none; opacity: 0;"></span>';
+                }
+            }
+            type();
         }
 
         // Handle Langkah 1
@@ -267,34 +338,33 @@
 
             btn.disabled = true;
             btn.textContent = "PROCESSING...";
+            btn.classList.add('loading'); // Tambah animasi kedip
             document.getElementById(resArea).classList.remove('show');
 
             try {
-                // Fetch Vercel API path
                 const targetUrl = `/api/am/sendv2?email=${encodeURIComponent(email)}`;
                 const response = await fetch(targetUrl);
                 const result = await response.json();
                 
                 if (!response.ok) throw new Error(result.message || "Gagal menghubungi server.");
                 
-                showStatus(resArea, "Link dikirim. Silakan cek inbox email kamu.");
+                typeWriterEffect(resArea, "Link dikirim. Silakan cek inbox email kamu.", false);
                 btn.textContent = "REQUEST SENT";
                 
-                // Interaksi: Buka gembok langkah 2
                 setTimeout(() => {
                     const step2 = document.getElementById('step2');
                     step2.classList.remove('disabled');
                     document.getElementById('verifEmail').value = email;
                     document.getElementById('verifLink').focus();
-                    
-                    // Scroll halus ke langkah 2
                     step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 800);
+                }, 1200); // Delay dikit biar efek ngetik kelar dulu
 
             } catch (error) {
-                showStatus(resArea, error.message, true);
+                typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
                 btn.textContent = "REQUEST LINK";
+            } finally {
+                btn.classList.remove('loading');
             }
         });
 
@@ -308,6 +378,7 @@
 
             btn.disabled = true;
             btn.textContent = "INJECTING...";
+            btn.classList.add('loading');
             document.getElementById(resArea).classList.remove('show');
 
             try {
@@ -317,14 +388,16 @@
 
                 if (!response.ok) throw new Error(result.message || "Verifikasi gagal.");
                 
-                showStatus(resArea, "Aktivasi sukses. Akun Premium siap digunakan.");
+                typeWriterEffect(resArea, "Aktivasi sukses. Akun Premium siap digunakan.", false);
                 btn.textContent = "SUCCESS";
                 btn.style.backgroundColor = "#fff";
                 btn.style.color = "#000";
             } catch (error) {
-                showStatus(resArea, error.message, true);
+                typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
                 btn.textContent = "INJECT PREMIUM";
+            } finally {
+                btn.classList.remove('loading');
             }
         });
     </script>
