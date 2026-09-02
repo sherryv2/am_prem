@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM.PREMIUM // SYSTEM</title>
+    <title>AM.PREMIUM // ACTIVATOR</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap');
 
         :root {
-            --bg: #050505;
-            --surface: rgba(15, 15, 15, 0.85);
-            --text-main: #f5f5f5;
-            --text-dim: #888888;
+            --bg: #0a0a0a;
+            --text-main: #ffffff;
+            --text-dim: #666666;
             --border: #333333;
             --accent: #ffffff;
             --error: #ff4a4a;
             --success: #ffffff;
-            --nav-hover: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -28,6 +26,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
+            /* Tambahan: Grid tipis ala blueprint/terminal */
             background-image: radial-gradient(var(--border) 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text-main);
@@ -35,86 +34,51 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 6vh 20px;
-            line-height: 1.6;
+            padding: 8vh 24px;
+            line-height: 1.5;
             overflow-x: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 540px;
+            max-width: 480px;
             position: relative;
             z-index: 1;
-            animation: fadeDown 0.8s ease-out forwards;
         }
 
-        /* Top Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
-        }
-
-        .nav-brand {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: -0.05em;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            padding: 6px 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover {
-            color: var(--text-main);
-            background: var(--nav-hover);
-        }
-
-        .nav-btn.active {
-            color: var(--bg);
-            background: var(--text-main);
-            border-color: var(--text-main);
-        }
-
-        /* Main Content Area */
+        /* Container background biar text tetep kebaca di atas grid */
         .content-wrapper {
-            background: var(--surface);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 2.5rem;
-            border-radius: 2px;
-            border: 1px solid var(--border);
-            min-height: 450px;
-            position: relative;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(4px);
+            padding: 2rem;
+            border-radius: 4px;
+            border: 1px solid rgba(51, 51, 51, 0.5);
         }
 
-        /* Tab Content Sections */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
+        header {
+            margin-bottom: 3rem;
+            animation: fadeDown 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-20px);
         }
 
-        .tab-content.active {
-            display: block;
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
         }
 
-        /* --- STYLING UNTUK ACTIVATOR (FORM) --- */
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         .step {
             margin-bottom: 3rem;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -147,7 +111,7 @@
         }
 
         .step-title {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
             letter-spacing: -0.02em;
         }
@@ -164,8 +128,8 @@
             border-bottom: 1px solid var(--border);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            padding: 10px 0;
+            font-size: 1rem;
+            padding: 12px 0;
             outline: none;
             transition: border-color 0.3s ease;
         }
@@ -177,9 +141,9 @@
         label {
             position: absolute;
             left: 0;
-            top: 10px;
+            top: 12px;
             color: var(--text-dim);
-            font-size: 0.95rem;
+            font-size: 1rem;
             pointer-events: none;
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all;
         }
@@ -187,140 +151,57 @@
         input:focus ~ label,
         input:valid ~ label,
         input:not(:placeholder-shown) ~ label {
-            top: -14px;
-            font-size: 0.7rem;
+            top: -12px;
+            font-size: 0.75rem;
             color: var(--accent);
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
 
-        button.action-btn {
+        button {
             width: 100%;
-            background-color: transparent;
-            color: var(--text-main);
+            background-color: var(--text-main);
+            color: var(--bg);
             border: 1px solid var(--text-main);
-            padding: 14px;
+            padding: 16px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        button.action-btn:hover {
-            background-color: var(--text-main);
-            color: var(--bg);
+        button:hover {
+            background-color: transparent;
+            color: var(--text-main);
         }
 
-        button.action-btn:disabled {
+        button:disabled {
             background-color: transparent;
             color: var(--text-dim);
             border-color: var(--border);
             cursor: not-allowed;
         }
 
-        button.action-btn.loading {
+        /* Tambahan: Animasi loading pada button */
+        button.loading {
             animation: pulse 1.5s infinite;
         }
 
-        /* --- STYLING UNTUK DOCS & CONTACT --- */
-        .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        @keyframes pulse {
+            0% { opacity: 1; border-color: var(--border); }
+            50% { opacity: 0.5; border-color: var(--text-dim); }
+            100% { opacity: 1; border-color: var(--border); }
         }
 
-        .section-desc {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px dashed var(--border);
-            padding-bottom: 1rem;
-        }
-
-        .docs-list {
-            list-style: none;
-            counter-reset: docs-counter;
-        }
-
-        .docs-list li {
-            position: relative;
-            padding-left: 2rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            color: #d0d0d0;
-        }
-
-        .docs-list li::before {
-            counter-increment: docs-counter;
-            content: "0" counter(docs-counter);
-            position: absolute;
-            left: 0;
-            top: 2px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
-
-        .docs-list code {
-            font-family: 'JetBrains Mono', monospace;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 2px;
-            font-size: 0.8rem;
-            color: var(--accent);
-        }
-
-        .contact-card {
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .contact-card:hover {
-            border-color: var(--text-dim);
-        }
-
-        .contact-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .contact-row:last-child {
-            border-bottom: none;
-        }
-
-        .contact-label {
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .contact-val {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        
-        a.contact-val:hover {
-            color: #4facfe;
-        }
-
-        /* Utilities */
         .status-msg {
             margin-top: 1.5rem;
             font-size: 0.85rem;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Space Grotesk', monospace;
             display: none;
             opacity: 0;
             transform: translateY(10px);
@@ -337,6 +218,7 @@
         .msg-error { color: var(--error); }
         .msg-success { color: var(--success); }
 
+        /* Tambahan: Blinking cursor untuk efek ngetik */
         .cursor {
             display: inline-block;
             width: 8px;
@@ -347,29 +229,26 @@
             animation: blink 1s step-end infinite;
         }
 
-        footer {
-            margin-top: 3rem;
-            text-align: center;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; border-color: var(--border); }
-            50% { opacity: 0.5; border-color: var(--text-dim); }
-            100% { opacity: 1; border-color: var(--border); }
-        }
-
         @keyframes blink { 50% { opacity: 0; } }
+
+        /* Tambahan: Minimalist Footer */
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            border-top: 1px dashed var(--border);
+            padding-top: 2rem;
+            letter-spacing: 0.05em;
+        }
         
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        footer span {
+            color: var(--text-main);
+            font-weight: 600;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeDown {
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -377,128 +256,63 @@
 <body>
 
     <div class="container">
-        
-        <!-- Header & Navigasi -->
-        <nav>
-            <div class="nav-brand">AM.PREMIUM</div>
-            <div class="nav-links">
-                <button class="nav-btn active" onclick="switchTab('activator')">[ INJECT ]</button>
-                <button class="nav-btn" onclick="switchTab('docs')">[ DOCS ]</button>
-                <button class="nav-btn" onclick="switchTab('contact')">[ DEV ]</button>
-            </div>
-        </nav>
-
         <div class="content-wrapper">
-            
-            <!-- TAB 1: ACTIVATOR (FORM) -->
-            <div id="tab-activator" class="tab-content active">
-                <div class="step" id="step1">
-                    <div class="step-header">
-                        <span class="step-num">1</span>
-                        <h2 class="step-title">Authentication Request</h2>
-                    </div>
-                    <form id="formSend">
-                        <div class="input-group">
-                            <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
-                            <label>Alamat Email Akun AM</label>
-                        </div>
-                        <button type="submit" id="btnSend" class="action-btn">Kirim Auth Link</button>
-                        <div id="resSend" class="status-msg"></div>
-                    </form>
-                </div>
+            <header>
+                <h1>AM.PREMIUM</h1>
+                <p class="subtitle">Developed by Adam // 1.0 </p>
+            </header>
 
-                <div class="step disabled" id="step2">
-                    <div class="step-header">
-                        <span class="step-num">2</span>
-                        <h2 class="step-title">Verify & Bypass</h2>
-                    </div>
-                    <form id="formVerif">
-                        <div class="input-group">
-                            <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
-                            <label>Target Email</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
-                            <label>Paste Verification Link</label>
-                        </div>
-                        <button type="submit" id="btnVerif" class="action-btn">Eksekusi Inject</button>
-                        <div id="resVerif" class="status-msg"></div>
-                    </form>
+            <div class="step" id="step1">
+                <div class="step-header">
+                    <span class="step-num">1</span>
+                    <h2 class="step-title">Authentication Link</h2>
                 </div>
+                
+                <form id="formSend">
+                    <div class="input-group">
+                        <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
+                        <label>Alamat Email</label>
+                    </div>
+                    <button type="submit" id="btnSend">Request Link</button>
+                    <div id="resSend" class="status-msg"></div>
+                </form>
             </div>
 
-            <!-- TAB 2: DOCS (PANDUAN) -->
-            <div id="tab-docs" class="tab-content">
-                <h2 class="section-title">Documentation</h2>
-                <p class="section-desc">Panduan sistem bypass Firebase untuk aktivasi fitur Premium.</p>
-                
-                <ul class="docs-list">
-                    <li>
-                        <strong>Request Link:</strong> Masukkan email yang terdaftar di akun Alight Motion Anda pada form Langkah 1, lalu klik eksekusi. Sistem akan memicu Firebase Auth.
-                    </li>
-                    <li>
-                        <strong>Cek Kotak Masuk:</strong> Buka aplikasi Gmail/Email Anda. Cari email masuk dari <code>Alight Creative</code> yang berisi tombol "Sign In to Alight Motion".
-                    </li>
-                    <li>
-                        <strong>Salin URL (Copy Link):</strong> Jangan klik tombol tersebut! Melainkan, <strong>tekan tahan</strong> pada tombol "Sign In", lalu pilih <code>Copy URL</code> atau <code>Salin tautan</code>.
-                    </li>
-                    <li>
-                        <strong>Proses Inject:</strong> Kembali ke web ini. Tempel (Paste) link panjang tersebut ke form di Langkah 2. Klik Eksekusi Inject. Selesai.
-                    </li>
-                </ul>
-            </div>
-
-            <!-- TAB 3: CONTACT (DEV) -->
-            <div id="tab-contact" class="tab-content">
-                <h2 class="section-title">Developer Info</h2>
-                <p class="section-desc">Sistem ini dikelola secara independen. Gunakan dengan bijak.</p>
-                
-                <div class="contact-card">
-                    <div class="contact-row">
-                        <span class="contact-label">Status</span>
-                        <span class="contact-val" style="color: #00ff88;">[ ONLINE ]</span>
-                    </div>
-                    <div class="contact-row">
-                        <span class="contact-label">Developed By</span>
-                        <span class="contact-val">Adam</span>
-                    </div>
-                    <div class="contact-row">
-                        <span class="contact-label">Email</span>
-                        <!-- Menggunakan email dari screenshot lu -->
-                        <a href="mailto:adamganz95@gmail.com" class="contact-val">adamganz95@gmail.com</a>
-                    </div>
-                    <div class="contact-row">
-                        <span class="contact-label">Repository</span>
-                        <a href="https://github.com/adamganz" target="_blank" class="contact-val">github.com/adamganz -></a>
-                    </div>
+            <div class="step disabled" id="step2">
+                <div class="step-header">
+                    <span class="step-num">2</span>
+                    <h2 class="step-title">Verify & Inject</h2>
                 </div>
+                
+                <form id="formVerif">
+                    <div class="input-group">
+                        <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
+                        <label>Email Terdaftar</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
+                        <label>Paste Verification Link</label>
+                    </div>
+                    <button type="submit" id="btnVerif">Inject Premium</button>
+                    <div id="resVerif" class="status-msg"></div>
+                </form>
             </div>
 
             <footer>
-                SYS.VER // 2.0.4 &copy; 2026
+                <p>SECURE INJECTION SYSTEM &copy; 2026</p>
+                <p>ACCESS LEVEL: <span>ROOT</span> // DEV: <span>ADAM</span></p>
             </footer>
         </div>
     </div>
 
     <script>
-        // Logika Navigasi Tab
-        function switchTab(tabId) {
-            // Hapus class active dari semua button dan content
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Tambah class active ke target
-            event.target.classList.add('active');
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-        }
-
-        // Efek Ngetik (Typewriter)
+        // Fungsi tambahan: Efek Ngetik (Typewriter)
         function typeWriterEffect(elementId, text, isError) {
             const el = document.getElementById(elementId);
             el.className = `status-msg show ${isError ? 'msg-error' : 'msg-success'}`;
-            el.innerHTML = ''; 
+            el.innerHTML = ''; // Kosongkan dulu
             
-            const prefix = isError ? 'ERR > ' : 'SYS > ';
+            const prefix = isError ? '[ERROR] ' : '[OK] ';
             const fullText = prefix + text;
             let i = 0;
 
@@ -506,8 +320,9 @@
                 if (i < fullText.length) {
                     el.innerHTML = fullText.substring(0, i + 1) + '<span class="cursor"></span>';
                     i++;
-                    setTimeout(type, 25);
+                    setTimeout(type, 30); // Kecepatan ngetik
                 } else {
+                    // Berhenti ngetik, biarkan cursor kedip bentar trus ilangin
                     el.innerHTML = fullText + '<span class="cursor" style="animation: none; opacity: 0;"></span>';
                 }
             }
@@ -522,8 +337,8 @@
             const resArea = 'resSend';
 
             btn.disabled = true;
-            btn.textContent = "EXECUTING...";
-            btn.classList.add('loading');
+            btn.textContent = "PROCESSING...";
+            btn.classList.add('loading'); // Tambah animasi kedip
             document.getElementById(resArea).classList.remove('show');
 
             try {
@@ -531,22 +346,23 @@
                 const response = await fetch(targetUrl);
                 const result = await response.json();
                 
-                if (!response.ok) throw new Error(result.message || "Koneksi ke endpoint gagal.");
+                if (!response.ok) throw new Error(result.message || "Gagal menghubungi server.");
                 
-                typeWriterEffect(resArea, "Payload terkirim. Cek email Anda.", false);
-                btn.textContent = "AUTH SENT";
+                typeWriterEffect(resArea, "Link dikirim. Silakan cek inbox email kamu.", false);
+                btn.textContent = "REQUEST SENT";
                 
                 setTimeout(() => {
                     const step2 = document.getElementById('step2');
                     step2.classList.remove('disabled');
                     document.getElementById('verifEmail').value = email;
                     document.getElementById('verifLink').focus();
-                }, 1200);
+                    step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 1200); // Delay dikit biar efek ngetik kelar dulu
 
             } catch (error) {
                 typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
-                btn.textContent = "KIRIM AUTH LINK";
+                btn.textContent = "REQUEST LINK";
             } finally {
                 btn.classList.remove('loading');
             }
@@ -561,7 +377,7 @@
             const resArea = 'resVerif';
 
             btn.disabled = true;
-            btn.textContent = "BYPASSING...";
+            btn.textContent = "INJECTING...";
             btn.classList.add('loading');
             document.getElementById(resArea).classList.remove('show');
 
@@ -570,16 +386,16 @@
                 const response = await fetch(targetUrl);
                 const result = await response.json();
 
-                if (!response.ok) throw new Error(result.message || "Gagal verifikasi token.");
+                if (!response.ok) throw new Error(result.message || "Verifikasi gagal.");
                 
-                typeWriterEffect(resArea, "Bypass berhasil. Premium diaktifkan.", false);
-                btn.textContent = "INJECTED";
-                btn.style.backgroundColor = "var(--text-main)";
-                btn.style.color = "var(--bg)";
+                typeWriterEffect(resArea, "Aktivasi sukses. Akun Premium siap digunakan.", false);
+                btn.textContent = "SUCCESS";
+                btn.style.backgroundColor = "#fff";
+                btn.style.color = "#000";
             } catch (error) {
                 typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
-                btn.textContent = "EKSEKUSI INJECT";
+                btn.textContent = "INJECT PREMIUM";
             } finally {
                 btn.classList.remove('loading');
             }
