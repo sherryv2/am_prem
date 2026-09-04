@@ -1,417 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM.PREMIUM // ACTIVATOR</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Lexend+Mega:wght@700;900&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AM.HOSTING // CUSTOM API</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&display=swap');
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #fff4e6;
+      display: flex;
+      justify-content: center;
+      padding: 50px 20px;
+    }
 
-        :root {
-            --bg: #fff4e6;
-            --card-bg: #ffffff;
-            --main-yellow: #ffe600;
-            --accent-pink: #ff6b8b;
-            --accent-cyan: #00f0ff;
-            --accent-green: #00e676;
-            --text-main: #000000;
-            --border-color: #000000;
-            --border-width: 3px;
-            --shadow-hard: 5px 5px 0px #000000;
-            --shadow-button: 4px 4px 0px #000000;
-            --shadow-button-active: 0px 0px 0px #000000;
-        }
+    .card {
+      background: #fff;
+      border: 3px solid #000;
+      box-shadow: 6px 6px 0px #000;
+      padding: 2rem;
+      max-width: 450px;
+      width: 100%;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    h1 {
+      background: #ffe600;
+      border: 3px solid #000;
+      display: inline-block;
+      padding: 4px 8px;
+      box-shadow: 3px 3px 0px #000;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
 
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(var(--border-color) 2px, transparent 2px);
-            background-size: 20px 20px;
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 6vh 20px;
-            line-height: 1.4;
-        }
+    input[type="file"] {
+      border: 3px solid #000;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+      background: #fff;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
+    button {
+      width: 100%;
+      background: #00f0ff;
+      border: 3px solid #000;
+      padding: 12px;
+      font-weight: 900;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px #000;
+      text-transform: uppercase;
+    }
 
-        .content-wrapper {
-            background: var(--card-bg);
-            border: var(--border-width) solid var(--border-color);
-            box-shadow: var(--shadow-hard);
-            padding: 2.5rem 2rem;
-            position: relative;
-        }
+    button:hover {
+      background: #ff6b8b;
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #000;
+    }
 
-        /* Neobrutalism Decorative Badge */
-        .badge {
-            position: absolute;
-            top: -18px;
-            right: 20px;
-            background: var(--accent-pink);
-            color: #fff;
-            border: var(--border-width) solid var(--border-color);
-            padding: 4px 12px;
-            font-weight: 900;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            box-shadow: 2px 2px 0px #000;
-            transform: rotate(2deg);
-        }
+    .result {
+      margin-top: 1.5rem;
+      padding: 12px;
+      background: #00e676;
+      border: 3px solid #000;
+      box-shadow: 3px 3px 0px #000;
+      display: none;
+      word-break: break-all;
+    }
 
-        header {
-            margin-bottom: 2.5rem;
-            border-bottom: var(--border-width) solid var(--border-color);
-            padding-bottom: 1.5rem;
-        }
-
-        h1 {
-            font-family: 'Lexend Mega', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -0.03em;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            background: var(--main-yellow);
-            display: inline-block;
-            padding: 2px 8px;
-            border: var(--border-width) solid var(--border-color);
-            box-shadow: 3px 3px 0px #000;
-        }
-
-        p.subtitle {
-            color: var(--text-main);
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 8px;
-        }
-
-        .step {
-            margin-bottom: 2.5rem;
-            background: #fff;
-            border: var(--border-width) solid var(--border-color);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-hard);
-            transition: all 0.2s ease;
-        }
-
-        .step.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            background: #e0e0e0;
-            box-shadow: none;
-        }
-
-        .step-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1.25rem;
-        }
-
-        .step-num {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: var(--accent-cyan);
-            border: var(--border-width) solid var(--border-color);
-            font-size: 1rem;
-            font-weight: 900;
-            box-shadow: 2px 2px 0px #000;
-        }
-
-        .step-title {
-            font-size: 1.1rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -0.01em;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 1.25rem;
-        }
-
-        label {
-            font-size: 0.8rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        input {
-            width: 100%;
-            background: #fff;
-            border: var(--border-width) solid var(--border-color);
-            color: var(--text-main);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 700;
-            padding: 12px;
-            outline: none;
-            box-shadow: 3px 3px 0px #000;
-            transition: all 0.15s ease;
-        }
-
-        input:focus {
-            background: #fffdf0;
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px #000;
-        }
-
-        input[readonly] {
-            background: #f0f0f0;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        button {
-            width: 100%;
-            background-color: var(--main-yellow);
-            color: var(--text-main);
-            border: var(--border-width) solid var(--border-color);
-            padding: 14px;
-            font-family: 'Lexend Mega', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            box-shadow: var(--shadow-button);
-            transition: all 0.1s ease;
-        }
-
-        button:hover {
-            background-color: var(--accent-cyan);
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px #000;
-        }
-
-        button:active {
-            transform: translate(4px, 4px);
-            box-shadow: var(--shadow-button-active);
-        }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .status-msg {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 10px;
-            border: var(--border-width) solid var(--border-color);
-            display: none;
-            box-shadow: 3px 3px 0px #000;
-        }
-
-        .status-msg.show {
-            display: block;
-        }
-
-        .msg-error {
-            background-color: var(--accent-pink);
-            color: #fff;
-        }
-
-        .msg-success {
-            background-color: var(--accent-green);
-            color: #000;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 14px;
-            background-color: currentColor;
-            vertical-align: middle;
-            margin-left: 4px;
-            animation: blink 0.8s infinite;
-        }
-
-        @keyframes blink { 50% { opacity: 0; } }
-
-        footer {
-            margin-top: 2rem;
-            text-align: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: var(--accent-cyan);
-            border: var(--border-width) solid var(--border-color);
-            padding: 1rem;
-            box-shadow: var(--shadow-hard);
-            text-transform: uppercase;
-        }
-
-        footer span {
-            text-decoration: underline;
-            font-weight: 900;
-        }
-    </style>
+    img {
+      max-width: 100%;
+      margin-top: 10px;
+      border: 2px solid #000;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="badge">v1.0 System</div>
-            
-            <header>
-                <h1>AM.PREMIUM</h1>
-                <p class="subtitle">DEVELOPED BY ADAM // SYSTEM INJECTOR</p>
-            </header>
+<div class="card">
+  <h1>IMAGE TO LINK</h1>
+  <form id="uploadForm">
+    <input type="file" id="imageInput" accept="image/*" required>
+    <button type="submit" id="btnSubmit">GENERATE LINK</button>
+  </form>
 
-            <div class="step" id="step1">
-                <div class="step-header">
-                    <span class="step-num">1</span>
-                    <h2 class="step-title">Authentication Link</h2>
-                </div>
-                
-                <form id="formSend">
-                    <div class="input-group">
-                        <label for="sendEmail">Alamat Email</label>
-                        <input type="email" id="sendEmail" placeholder="nama@email.com" required autocomplete="off">
-                    </div>
-                    <button type="submit" id="btnSend">Request Link</button>
-                    <div id="resSend" class="status-msg"></div>
-                </form>
-            </div>
+  <div id="resultBox" class="result">
+    <p><strong>URL GAMBAR PUBLIC:</strong></p>
+    <a id="imageUrl" href="" target="_blank" style="color: #000;"></a>
+    <br><br>
+    <img id="imagePreview" src="" alt="Preview">
+  </div>
+</div>
 
-            <div class="step disabled" id="step2">
-                <div class="step-header">
-                    <span class="step-num">2</span>
-                    <h2 class="step-title">Verify & Inject</h2>
-                </div>
-                
-                <form id="formVerif">
-                    <div class="input-group">
-                        <label for="verifEmail">Email Terdaftar</label>
-                        <input type="email" id="verifEmail" required readonly>
-                    </div>
-                    <div class="input-group">
-                        <label for="verifLink">Paste Verification Link</label>
-                        <input type="text" id="verifLink" placeholder="https://..." required autocomplete="off">
-                    </div>
-                    <button type="submit" id="btnVerif">Inject Premium</button>
-                    <div id="resVerif" class="status-msg"></div>
-                </form>
-            </div>
+<script>
+  const API_URL = "https://api.alwayscodex.eu.cc/api/tools/upload2";
 
-            <footer>
-                <p>SECURE INJECTION SYSTEM &copy; 2026</p>
-                <p>ACCESS LEVEL: <span>ROOT</span> // DEV: <span>ADAM</span></p>
-            </footer>
-        </div>
-    </div>
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('imageInput');
+    const btn = document.getElementById('btnSubmit');
+    const resultBox = document.getElementById('resultBox');
 
-    <script>
-        function typeWriterEffect(elementId, text, isError) {
-            const el = document.getElementById(elementId);
-            el.className = `status-msg show ${isError ? 'msg-error' : 'msg-success'}`;
-            el.innerHTML = '';
-            
-            const prefix = isError ? '[ERROR] ' : '[OK] ';
-            const fullText = prefix + text;
-            let i = 0;
+    const file = fileInput.files[0];
+    if (!file) return;
 
-            function type() {
-                if (i < fullText.length) {
-                    el.innerHTML = fullText.substring(0, i + 1) + '<span class="cursor"></span>';
-                    i++;
-                    setTimeout(type, 25);
-                } else {
-                    el.innerHTML = fullText + '<span class="cursor" style="animation: none; opacity: 0;"></span>';
-                }
-            }
-            type();
-        }
+    btn.disabled = true;
+    btn.innerText = "UPLOADING TO API...";
 
-        document.getElementById('formSend').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('sendEmail').value;
-            const btn = document.getElementById('btnSend');
-            const resArea = 'resSend';
+    const formData = new FormData();
+    // Menggunakan key 'file' atau 'image' sesuai standar API multipart
+    formData.append('file', file);
 
-            btn.disabled = true;
-            btn.textContent = "PROCESSING...";
-            document.getElementById(resArea).classList.remove('show');
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData
+      });
 
-            try {
-                const targetUrl = `/api/am/sendv2?email=${encodeURIComponent(email)}`;
-                const response = await fetch(targetUrl);
-                const result = await response.json();
-                
-                if (!response.ok) throw new Error(result.message || "Gagal menghubungi server.");
-                
-                typeWriterEffect(resArea, "Link dikirim. Silakan cek inbox email kamu.", false);
-                btn.textContent = "REQUEST SENT";
-                
-                setTimeout(() => {
-                    const step2 = document.getElementById('step2');
-                    step2.classList.remove('disabled');
-                    document.getElementById('verifEmail').value = email;
-                    document.getElementById('verifLink').focus();
-                    step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1000);
+      const data = await response.json();
 
-            } catch (error) {
-                typeWriterEffect(resArea, error.message, true);
-                btn.disabled = false;
-                btn.textContent = "REQUEST LINK";
-            }
-        });
+      // Mengecek respons URL dari API (menyesuaikan struktur json return)
+      const resultUrl = data.url || data.result || data.link || (data.data && data.data.url);
 
-        document.getElementById('formVerif').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('verifEmail').value;
-            const link = document.getElementById('verifLink').value;
-            const btn = document.getElementById('btnVerif');
-            const resArea = 'resVerif';
+      if (resultUrl) {
+        document.getElementById('imageUrl').href = resultUrl;
+        document.getElementById('imageUrl').innerText = resultUrl;
+        document.getElementById('imagePreview').src = resultUrl;
+        resultBox.style.display = 'block';
+      } else {
+        alert("Upload gagal atau format respons API tidak dikenali: " + JSON.stringify(data));
+      }
+    } catch (err) {
+      alert("Error menghubungi API: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "GENERATE LINK";
+    }
+  });
+</script>
 
-            btn.disabled = true;
-            btn.textContent = "INJECTING...";
-            document.getElementById(resArea).classList.remove('show');
-
-            try {
-                const targetUrl = `/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
-                const response = await fetch(targetUrl);
-                const result = await response.json();
-
-                if (!response.ok) throw new Error(result.message || "Verifikasi gagal.");
-                
-                typeWriterEffect(resArea, "Aktivasi sukses. Akun Premium siap digunakan.", false);
-                btn.textContent = "SUCCESS";
-                btn.style.backgroundColor = "var(--accent-green)";
-            } catch (error) {
-                typeWriterEffect(resArea, error.message, true);
-                btn.disabled = false;
-                btn.textContent = "INJECT PREMIUM";
-            }
-        });
-    </script>
 </body>
 </html>
