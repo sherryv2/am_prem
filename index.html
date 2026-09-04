@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AM.PREMIUM // ACTIVATOR</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Lexend+Mega:wght@700;900&display=swap');
 
         :root {
-            --bg: #0a0a0a;
-            --text-main: #ffffff;
-            --text-dim: #666666;
-            --border: #333333;
-            --accent: #ffffff;
-            --error: #ff4a4a;
-            --success: #ffffff;
+            --bg: #fff4e6;
+            --card-bg: #ffffff;
+            --main-yellow: #ffe600;
+            --accent-pink: #ff6b8b;
+            --accent-cyan: #00f0ff;
+            --accent-green: #00e676;
+            --text-main: #000000;
+            --border-color: #000000;
+            --border-width: 3px;
+            --shadow-hard: 5px 5px 0px #000000;
+            --shadow-button: 4px 4px 0px #000000;
+            --shadow-button-active: 0px 0px 0px #000000;
         }
 
         * {
@@ -24,232 +29,248 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             background-color: var(--bg);
-            /* Tambahan: Grid tipis ala blueprint/terminal */
-            background-image: radial-gradient(var(--border) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: 
+                radial-gradient(var(--border-color) 2px, transparent 2px);
+            background-size: 20px 20px;
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 8vh 24px;
-            line-height: 1.5;
-            overflow-x: hidden;
+            padding: 6vh 20px;
+            line-height: 1.4;
         }
 
         .container {
             width: 100%;
             max-width: 480px;
-            position: relative;
-            z-index: 1;
         }
 
-        /* Container background biar text tetep kebaca di atas grid */
         .content-wrapper {
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(4px);
-            padding: 2rem;
-            border-radius: 4px;
-            border: 1px solid rgba(51, 51, 51, 0.5);
+            background: var(--card-bg);
+            border: var(--border-width) solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            padding: 2.5rem 2rem;
+            position: relative;
+        }
+
+        /* Neobrutalism Decorative Badge */
+        .badge {
+            position: absolute;
+            top: -18px;
+            right: 20px;
+            background: var(--accent-pink);
+            color: #fff;
+            border: var(--border-width) solid var(--border-color);
+            padding: 4px 12px;
+            font-weight: 900;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 2px 2px 0px #000;
+            transform: rotate(2deg);
         }
 
         header {
-            margin-bottom: 3rem;
-            animation: fadeDown 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(-20px);
+            margin-bottom: 2.5rem;
+            border-bottom: var(--border-width) solid var(--border-color);
+            padding-bottom: 1.5rem;
         }
 
         h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.05em;
-            line-height: 1.1;
+            font-family: 'Lexend Mega', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 1;
             margin-bottom: 0.5rem;
+            background: var(--main-yellow);
+            display: inline-block;
+            padding: 2px 8px;
+            border: var(--border-width) solid var(--border-color);
+            box-shadow: 3px 3px 0px #000;
         }
 
         p.subtitle {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            margin-top: 8px;
         }
 
         .step {
-            margin-bottom: 3rem;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2.5rem;
+            background: #fff;
+            border: var(--border-width) solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-hard);
+            transition: all 0.2s ease;
         }
 
         .step.disabled {
-            opacity: 0.3;
+            opacity: 0.5;
             pointer-events: none;
-            filter: grayscale(100%);
+            background: #e0e0e0;
+            box-shadow: none;
         }
 
         .step-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 1.5rem;
-            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 1.25rem;
         }
 
         .step-num {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
-            border: 1px solid var(--text-main);
-            border-radius: 50%;
-            font-size: 0.8rem;
-            font-weight: 700;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-cyan);
+            border: var(--border-width) solid var(--border-color);
+            font-size: 1rem;
+            font-weight: 900;
+            box-shadow: 2px 2px 0px #000;
         }
 
         .step-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
         }
 
         .input-group {
-            position: relative;
-            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         input {
             width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--border);
+            background: #fff;
+            border: var(--border-width) solid var(--border-color);
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            padding: 12px 0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 12px;
             outline: none;
-            transition: border-color 0.3s ease;
+            box-shadow: 3px 3px 0px #000;
+            transition: all 0.15s ease;
         }
 
         input:focus {
-            border-bottom-color: var(--accent);
+            background: #fffdf0;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #000;
         }
 
-        label {
-            position: absolute;
-            left: 0;
-            top: 12px;
-            color: var(--text-dim);
-            font-size: 1rem;
-            pointer-events: none;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all;
-        }
-
-        input:focus ~ label,
-        input:valid ~ label,
-        input:not(:placeholder-shown) ~ label {
-            top: -12px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
+        input[readonly] {
+            background: #f0f0f0;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         button {
             width: 100%;
-            background-color: var(--text-main);
-            color: var(--bg);
-            border: 1px solid var(--text-main);
-            padding: 16px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
+            background-color: var(--main-yellow);
+            color: var(--text-main);
+            border: var(--border-width) solid var(--border-color);
+            padding: 14px;
+            font-family: 'Lexend Mega', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-button);
+            transition: all 0.1s ease;
         }
 
         button:hover {
-            background-color: transparent;
-            color: var(--text-main);
+            background-color: var(--accent-cyan);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        button:active {
+            transform: translate(4px, 4px);
+            box-shadow: var(--shadow-button-active);
         }
 
         button:disabled {
-            background-color: transparent;
-            color: var(--text-dim);
-            border-color: var(--border);
+            background-color: #ccc;
             cursor: not-allowed;
-        }
-
-        /* Tambahan: Animasi loading pada button */
-        button.loading {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; border-color: var(--border); }
-            50% { opacity: 0.5; border-color: var(--text-dim); }
-            100% { opacity: 1; border-color: var(--border); }
+            box-shadow: none;
+            transform: none;
         }
 
         .status-msg {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             font-size: 0.85rem;
-            font-family: 'Space Grotesk', monospace;
+            font-weight: 700;
+            padding: 10px;
+            border: var(--border-width) solid var(--border-color);
             display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            min-height: 20px;
+            box-shadow: 3px 3px 0px #000;
         }
 
         .status-msg.show {
             display: block;
-            opacity: 1;
-            transform: translateY(0);
         }
 
-        .msg-error { color: var(--error); }
-        .msg-success { color: var(--success); }
+        .msg-error {
+            background-color: var(--accent-pink);
+            color: #fff;
+        }
 
-        /* Tambahan: Blinking cursor untuk efek ngetik */
+        .msg-success {
+            background-color: var(--accent-green);
+            color: #000;
+        }
+
         .cursor {
             display: inline-block;
             width: 8px;
-            height: 15px;
+            height: 14px;
             background-color: currentColor;
             vertical-align: middle;
             margin-left: 4px;
-            animation: blink 1s step-end infinite;
+            animation: blink 0.8s infinite;
         }
 
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Tambahan: Minimalist Footer */
         footer {
-            margin-top: 4rem;
+            margin-top: 2rem;
             text-align: center;
-            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.75rem;
-            color: var(--text-dim);
-            border-top: 1px dashed var(--border);
-            padding-top: 2rem;
-            letter-spacing: 0.05em;
-        }
-        
-        footer span {
-            color: var(--text-main);
-            font-weight: 600;
+            font-weight: 700;
+            background: var(--accent-cyan);
+            border: var(--border-width) solid var(--border-color);
+            padding: 1rem;
+            box-shadow: var(--shadow-hard);
+            text-transform: uppercase;
         }
 
-        @keyframes fadeDown {
-            to { opacity: 1; transform: translateY(0); }
+        footer span {
+            text-decoration: underline;
+            font-weight: 900;
         }
     </style>
 </head>
@@ -257,9 +278,11 @@
 
     <div class="container">
         <div class="content-wrapper">
+            <div class="badge">v1.0 System</div>
+            
             <header>
                 <h1>AM.PREMIUM</h1>
-                <p class="subtitle">Developed by Adam // 1.0 </p>
+                <p class="subtitle">DEVELOPED BY ADAM // SYSTEM INJECTOR</p>
             </header>
 
             <div class="step" id="step1">
@@ -270,8 +293,8 @@
                 
                 <form id="formSend">
                     <div class="input-group">
-                        <input type="email" id="sendEmail" placeholder=" " required autocomplete="off">
-                        <label>Alamat Email</label>
+                        <label for="sendEmail">Alamat Email</label>
+                        <input type="email" id="sendEmail" placeholder="nama@email.com" required autocomplete="off">
                     </div>
                     <button type="submit" id="btnSend">Request Link</button>
                     <div id="resSend" class="status-msg"></div>
@@ -286,12 +309,12 @@
                 
                 <form id="formVerif">
                     <div class="input-group">
-                        <input type="email" id="verifEmail" placeholder=" " required readonly style="color: var(--text-dim); border-bottom-style: dashed;">
-                        <label>Email Terdaftar</label>
+                        <label for="verifEmail">Email Terdaftar</label>
+                        <input type="email" id="verifEmail" required readonly>
                     </div>
                     <div class="input-group">
-                        <input type="text" id="verifLink" placeholder=" " required autocomplete="off">
-                        <label>Paste Verification Link</label>
+                        <label for="verifLink">Paste Verification Link</label>
+                        <input type="text" id="verifLink" placeholder="https://..." required autocomplete="off">
                     </div>
                     <button type="submit" id="btnVerif">Inject Premium</button>
                     <div id="resVerif" class="status-msg"></div>
@@ -306,11 +329,10 @@
     </div>
 
     <script>
-        // Fungsi tambahan: Efek Ngetik (Typewriter)
         function typeWriterEffect(elementId, text, isError) {
             const el = document.getElementById(elementId);
             el.className = `status-msg show ${isError ? 'msg-error' : 'msg-success'}`;
-            el.innerHTML = ''; // Kosongkan dulu
+            el.innerHTML = '';
             
             const prefix = isError ? '[ERROR] ' : '[OK] ';
             const fullText = prefix + text;
@@ -320,16 +342,14 @@
                 if (i < fullText.length) {
                     el.innerHTML = fullText.substring(0, i + 1) + '<span class="cursor"></span>';
                     i++;
-                    setTimeout(type, 30); // Kecepatan ngetik
+                    setTimeout(type, 25);
                 } else {
-                    // Berhenti ngetik, biarkan cursor kedip bentar trus ilangin
                     el.innerHTML = fullText + '<span class="cursor" style="animation: none; opacity: 0;"></span>';
                 }
             }
             type();
         }
 
-        // Handle Langkah 1
         document.getElementById('formSend').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('sendEmail').value;
@@ -338,7 +358,6 @@
 
             btn.disabled = true;
             btn.textContent = "PROCESSING...";
-            btn.classList.add('loading'); // Tambah animasi kedip
             document.getElementById(resArea).classList.remove('show');
 
             try {
@@ -357,18 +376,15 @@
                     document.getElementById('verifEmail').value = email;
                     document.getElementById('verifLink').focus();
                     step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1200); // Delay dikit biar efek ngetik kelar dulu
+                }, 1000);
 
             } catch (error) {
                 typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
                 btn.textContent = "REQUEST LINK";
-            } finally {
-                btn.classList.remove('loading');
             }
         });
 
-        // Handle Langkah 2
         document.getElementById('formVerif').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('verifEmail').value;
@@ -378,7 +394,6 @@
 
             btn.disabled = true;
             btn.textContent = "INJECTING...";
-            btn.classList.add('loading');
             document.getElementById(resArea).classList.remove('show');
 
             try {
@@ -390,14 +405,11 @@
                 
                 typeWriterEffect(resArea, "Aktivasi sukses. Akun Premium siap digunakan.", false);
                 btn.textContent = "SUCCESS";
-                btn.style.backgroundColor = "#fff";
-                btn.style.color = "#000";
+                btn.style.backgroundColor = "var(--accent-green)";
             } catch (error) {
                 typeWriterEffect(resArea, error.message, true);
                 btn.disabled = false;
                 btn.textContent = "INJECT PREMIUM";
-            } finally {
-                btn.classList.remove('loading');
             }
         });
     </script>
