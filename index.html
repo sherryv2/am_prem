@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>adam.dev - AM Premium Tool</title>
+  <title>adam.dev - Auto AM Activator</title>
   <style>
     * {
       box-sizing: border-box;
@@ -43,7 +43,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      letter-spacing: 0.5px;
     }
 
     .header-bar span.brand {
@@ -113,7 +112,7 @@
 
     .output-box {
       width: 100%;
-      height: 65px;
+      height: 90px;
       margin-top: 6px;
       background-color: #000000;
       color: #00ff00;
@@ -135,12 +134,8 @@
     }
 
     @media (max-width: 360px) {
-      body {
-        padding: 4px;
-      }
-      .container {
-        padding: 8px;
-      }
+      body { padding: 4px; }
+      .container { padding: 8px; }
     }
   </style>
 </head>
@@ -148,101 +143,151 @@
 
   <div class="container">
     <div class="header-bar">
-      <span>[ AM ACTIVATOR ]</span>
+      <span>[ AUTO AM ACTIVATOR ]</span>
       <span class="brand">adam.dev</span>
     </div>
 
-    <!-- LANGKAH 1 -->
+    <!-- TAHAP 1 -->
     <fieldset>
-      <legend>Langkah 1: Kirim Link Verifikasi</legend>
+      <legend>Langkah 1: Buat Email & Kirim Request</legend>
       <div class="form-group">
-        <label for="email1">EMAIL USER:</label>
-        <input type="email" id="email1" placeholder="user@email.com" oninput="syncEmail()">
+        <label for="tempEmail">TEMP EMAIL GENERATED:</label>
+        <input type="email" id="tempEmail" placeholder="Klik tombol di bawah..." readonly>
       </div>
-      <button id="btn1" onclick="sendVerificationLink()">[ KIRIM EMAIL VERIFIKASI ]</button>
-      <textarea id="output1" class="output-box" readonly>[ Status: Menunggu perintah... ]</textarea>
+      <button id="btnStep1" onclick="generateAndSend()">[ 1. GENERATE EMAIL & KIRIM LINK ]</button>
     </fieldset>
 
-    <!-- LANGKAH 2 -->
+    <!-- TAHAP 2 -->
     <fieldset>
-      <legend>Langkah 2: Verifikasi & Apply Premium</legend>
+      <legend>Langkah 2: Auto Extract Link & Eksekusi</legend>
       <div class="form-group">
-        <label for="email2">EMAIL USER:</label>
-        <input type="email" id="email2" placeholder="user@email.com">
+        <label for="extractedLink">VERIFICATION LINK DETECTED:</label>
+        <input type="text" id="extractedLink" placeholder="Menunggu email masuk..." readonly>
       </div>
-      <div class="form-group">
-        <label for="link2">LINK VERIFIKASI DARI EMAIL:</label>
-        <input type="text" id="link2" placeholder="https://alightcreative.com/auth_...">
-      </div>
-      <button id="btn2" onclick="verifyAndApply()">[ AKTIFKAN PREMIUM ]</button>
-      <textarea id="output2" class="output-box" readonly>[ Status: Menunggu perintah... ]</textarea>
+      <button id="btnStep2" onclick="autoFetchAndVerify()" disabled>[ 2. CEK INBOX & AKTIFKAN PREMIUM ]</button>
+    </fieldset>
+
+    <!-- LOG STATUS -->
+    <fieldset>
+      <legend>System Console Output</legend>
+      <textarea id="consoleLog" class="output-box" readonly>[ Ready. Klik 'GENERATE EMAIL & KIRIM LINK' untuk memulai. ]</textarea>
     </fieldset>
 
     <div class="footer">
-      Powered by adam.dev
+      Automated Tool &bull; Powered by adam.dev
     </div>
   </div>
 
   <script>
-    const API_BASE = 'https://api.alwayscodex.eu.cc';
+    const BASE_API = 'https://api.alwayscodex.eu.cc';
 
-    function syncEmail() {
-      document.getElementById('email2').value = document.getElementById('email1').value;
+    // Helper untuk request API yang membaca JSON (dengan proxy fallback jika diblokir browser)
+    async function fetchJsonData(url) {
+      try {
+        let res = await fetch(url);
+        if (res.ok) return await res.json();
+      } catch (e) {}
+
+      // Fallback proxy untuk membaca data JSON inbox dari browser
+      let proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+      let res = await fetch(proxyUrl);
+      return await res.json();
     }
 
-    // Langkah 1: /api/am/sendv2
-    async function sendVerificationLink() {
-      const email = document.getElementById('email1').value.trim();
-      const out = document.getElementById('output1');
-      const btn = document.getElementById('btn1');
+    function log(msg) {
+      const consoleBox = document.getElementById('consoleLog');
+      consoleBox.value += `\n> ${msg}`;
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
 
-      if (!email) {
-        alert("Harap isi email terlebih dahulu!");
-        return;
-      }
+    // TAHAP 1: Generate Email & Langsung Kirim Verifikasi
+    async function generateAndSend() {
+      const btn1 = document.getElementById('btnStep1');
+      const emailInput = document.getElementById('tempEmail');
+      const consoleBox = document.getElementById('consoleLog');
 
-      btn.disabled = true;
-      out.value = "CONNECTING...\nMeminta pengiriman email...";
+      btn1.disabled = true;
+      consoleBox.value = "[ MENGHUBUNGI SERVER TEMP MAIL... ]";
 
       try {
-        const url = `${API_BASE}/api/am/sendv2?email=${encodeURIComponent(email)}`;
+        // 1. Create Temp Mail
+        const mailRes = await fetchJsonData(`${BASE_API}/api/tempmail/1timetech?action=create`);
         
-        // no-cors agar request tetap jalan tanpa error 'Failed to fetch' di browser
-        await fetch(url, { mode: 'no-cors' });
+        let createdEmail = mailRes.email || mailRes.result || (mailRes.data && mailRes.data.email);
+        
+        if (!createdEmail && typeof mailRes === 'object') {
+          // Fallback parsing jika format JSON dinamis
+          const str = JSON.stringify(mailRes);
+          const match = str.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+          if (match) createdEmail = match[0];
+        }
 
-        out.value = "SUCCESS!\nPermintaan terkirim ke server. Silakan cek inbox/spam email Anda.";
+        if (!createdEmail) {
+          throw new Error("Gagal mendapatkan email temporary dari server.");
+        }
+
+        emailInput.value = createdEmail;
+        log(`Email dibuat: ${createdEmail}`);
+        log("Mengirim permintaan link verifikasi Alight Motion...");
+
+        // 2. Send Verification Link to AM API
+        const sendUrl = `${BASE_API}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`;
+        await fetch(sendUrl, { mode: 'no-cors' });
+
+        log("Link verifikasi berhasil dikirim ke Inbox!");
+        log("Silakan klik tombol '2. CEK INBOX & AKTIFKAN PREMIUM'.");
+
+        document.getElementById('btnStep2').disabled = false;
       } catch (err) {
-        out.value = `ERROR:\n${err.message}`;
+        log(`ERROR: ${err.message}`);
       } finally {
-        btn.disabled = false;
+        btn1.disabled = false;
       }
     }
 
-    // Langkah 2: /api/am/verifv2
-    async function verifyAndApply() {
-      const email = document.getElementById('email2').value.trim();
-      const link = document.getElementById('link2').value.trim();
-      const out = document.getElementById('output2');
-      const btn = document.getElementById('btn2');
+    // TAHAP 2: Cek Inbox, Cari Link, & Langsung Eksekusi Premium
+    async function autoFetchAndVerify() {
+      const btn2 = document.getElementById('btnStep2');
+      const email = document.getElementById('tempEmail').value.trim();
+      const linkInput = document.getElementById('extractedLink');
 
-      if (!email || !link) {
-        alert("Email dan Link verifikasi wajib diisi!");
-        return;
-      }
+      if (!email) return alert("Email belum dibuat!");
 
-      btn.disabled = true;
-      out.value = "CONNECTING...\nMemproses aktivasi premium...";
+      btn2.disabled = true;
+      log("Mengecek inbox email...");
 
       try {
-        const url = `${API_BASE}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
-        
-        await fetch(url, { mode: 'no-cors' });
+        const inboxUrl = `${BASE_API}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`;
+        const inboxData = await fetchJsonData(inboxUrl);
 
-        out.value = "SUCCESS!\nProses verifikasi berhasil dikirim. Silakan cek akun Alight Motion Anda.";
+        const inboxString = JSON.stringify(inboxData);
+        
+        // Regex untuk mencari URL verifikasi Alight Motion di dalam teks pesan
+        const linkMatch = inboxString.match(/https?:\/\/[^\s"'\\]*alight[^\s"'\\]*/i) || 
+                          inboxString.match(/https?:\/\/[^\s"'\\]+auth[^\s"'\\]*/i);
+
+        if (!linkMatch) {
+          log("Email belum masuk/sistem sedang memproses. Coba klik tombol lagi dalam 5-10 detik.");
+          btn2.disabled = false;
+          return;
+        }
+
+        let extractedUrl = linkMatch[0].replace(/\\/g, ''); // Bersihkan backslash jika ada
+        linkInput.value = extractedUrl;
+        log(`Link ditemukan: ${extractedUrl.substring(0, 45)}...`);
+        log("Memproses aktivasi Premium...");
+
+        // Execute Verification API
+        const verifUrl = `${BASE_API}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(extractedUrl)}`;
+        await fetch(verifUrl, { mode: 'no-cors' });
+
+        log("==========================================");
+        log("SUKSES! Akun Premium telah berhasil diaktifkan!");
+        log("==========================================");
+
       } catch (err) {
-        out.value = `ERROR:\n${err.message}`;
-      } finally {
-        btn.disabled = false;
+        log(`ERROR: ${err.message}`);
+        btn2.disabled = false;
       }
     }
   </script>
