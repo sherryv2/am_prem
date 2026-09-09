@@ -132,8 +132,8 @@
     }
 
     button:disabled {
-      background-color: #808080;
-      color: #c0c0c0;
+      background-color: #808080 !important;
+      color: #c0c0c0 !important;
       cursor: not-allowed;
     }
 
@@ -229,33 +229,41 @@
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    // FUNGSI PENGESTRAK LINK VERIFIKASI (ANTI-FAILED)
+    // Helper fetch dengan timeout otomatis (8 detik) agar tidak pernah macet
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (e) {
+        clearTimeout(id);
+        throw e;
+      }
+    }
+
+    // Pembersih & Pengambil Link Verifikasi
     function extractBestVerificationLink(dataInbox) {
       if (!dataInbox) return null;
-
-      // 1. Ubah objek JSON menjadi string mentah
       let rawStr = typeof dataInbox === 'string' ? dataInbox : JSON.stringify(dataInbox);
 
-      // 2. Normalisasi format Quoted-Printable & Escaped Slashes
       rawStr = rawStr.replace(/=\r?\n/g, '')
                      .replace(/=3D/gi, '=')
-                     .replace(/\\\/g, '/')
+                     .replace(/\\\\/g, '/')
                      .replace(/\\n/gi, ' ')
                      .replace(/\\r/gi, ' ')
                      .replace(/\\"/g, '"');
 
-      // 3. Tangkap seluruh pola URL http/https
       const matches = rawStr.match(/https?:\/\/[^\s"'<>\\\]\[\}(\)]+/gi);
       if (!matches || matches.length === 0) return null;
 
-      // 4. Bersihkan karakter pengganggu di ujung URL
       const cleanUrls = matches.map(u => {
         let clean = u.replace(/["';,>)]+$/, '');
         try { clean = decodeURIComponent(clean); } catch(e){}
         return clean;
       });
 
-      // 5. Prioritaskan URL autentikasi Alight Motion / Firebase
       for (let u of cleanUrls) {
         let lower = u.toLowerCase();
         if ((lower.includes('alight') || lower.includes('firebase') || lower.includes('oobcode') || lower.includes('auth')) && 
@@ -263,16 +271,6 @@
           return u;
         }
       }
-
-      // 6. Fallback jika domain utama menggunakan redirect/shortener
-      for (let u of cleanUrls) {
-        let lower = u.toLowerCase();
-        if ((lower.includes('mode=') || lower.includes('code=') || lower.includes('link=')) &&
-            !lower.includes('alwayscodex') && !lower.includes('1timetech')) {
-          return u;
-        }
-      }
-
       return null;
     }
 
@@ -283,13 +281,14 @@
       const consoleBox = document.getElementById('consoleLog');
 
       btn.disabled = true;
+      btn.innerText = "[ ⏳ SEDANG MEMPROSES... ]";
       consoleBox.value = "[ MEMULAI PROSES... ]";
       emailInput.value = "";
 
       try {
-        // STEP 1: Buat Temp Email
+        // 1. Create Temp Email
         log("[1/4] Membuat temp email...");
-        const res1 = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=create`);
+        const res1 = await fetchWithTimeout(`${PROXY_BASE}/api/tempmail/1timetech?action=create`);
         const data1 = await res1.json();
 
         let createdEmail = data1.result ? data1.result.email : null;
@@ -302,22 +301,22 @@
 
         log(`[1/4] Email berhasil dibuat: ${createdEmail}`);
 
-        // STEP 2: Kirim Request Link Verifikasi
-        log("[2/4] Mengirim request link verifikasi ke Alight Motion...");
-        await fetch(`${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`);
+        // 2. Send Verification Link
+        log("[2/4] Mengirim request verifikasi...");
+        await fetchWithTimeout(`${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`);
         log("[2/4] Request berhasil dikirim.");
 
-        // STEP 3: Auto-check Inbox
-        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik)...");
+        // 3. Auto-check Inbox (5x pengecekan = ~15 detik)
+        log("[3/4] Menunggu email masuk (auto-check 5x)...");
         let foundLink = null;
         let attempts = 0;
 
-        while (attempts < 25 && !foundLink) {
+        while (attempts < 5 && !foundLink) {
           attempts++;
           await new Promise(r => setTimeout(r, 3000));
 
           try {
-            const resInbox = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`);
+            const resInbox = await fetchWithTimeout(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`);
             const dataInbox = await resInbox.json();
 
             foundLink = extractBestVerificationLink(dataInbox);
@@ -325,27 +324,26 @@
             if (foundLink) {
               log(`[3/4] Link verifikasi berhasil ditemukan!`);
             } else {
-              // Jika email sudah ada di inbox tapi link belum terekstrak vs email belum ada
-              let hasEmail = JSON.stringify(dataInbox).includes("alight");
-              log(`[3/4] Pengecekan ke-${attempts}/25... ${hasEmail ? 'Email masuk, membaca link...' : 'menunggu pesan...'}`);
+              log(`[3/4] Check ke-${attempts}/5... belum ada link.`);
             }
           } catch (e) {
-            log(`[3/4] Pengecekan ke-${attempts}... mengulang.`);
+            log(`[3/4] Check ke-${attempts}... mengulang.`);
           }
         }
 
         if (!foundLink) {
-          log("⚠️ Waktu habis. Silakan klik tombol '[ ⚡ PROSES DARI INBOX ]'.");
+          log("⚠️ Auto-check selesai. Jika email sudah muncul di kotak inbox bawah, klik '[ ⚡ PROSES DARI INBOX ]'.");
           return;
         }
 
-        // STEP 4: Eksekusi Aktivasi
+        // 4. Activate
         await executeActivation(createdEmail, foundLink);
 
       } catch (err) {
-        log(`❌ ERROR: ${err.message}`);
+        log(`❌ ERROR: ${err.message.includes('aborted') ? 'Koneksi timeout, silakan coba klik lagi.' : err.message}`);
       } finally {
         btn.disabled = false;
+        btn.innerText = "[ 🚀 BUAT & AKTIFKAN AKUN ]";
       }
     }
 
@@ -357,34 +355,35 @@
       if (!email) return alert("Belum ada email!");
 
       btn.disabled = true;
+      btn.innerText = "[ ⏳ MEMBACA INBOX... ]";
       log("Mengekstrak link dari inbox saat ini...");
 
       try {
-        const res = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
+        const res = await fetchWithTimeout(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
         const dataInbox = await res.json();
 
         const foundLink = extractBestVerificationLink(dataInbox);
 
         if (!foundLink) {
-          throw new Error("Link verifikasi belum ditemukan di dalam inbox.");
+          throw new Error("Link verifikasi belum ditemukan. Coba tekan 'CEK PESAN MASUK' terlebih dahulu.");
         }
 
-        log("Link verifikasi berhasil diekstrak!");
+        log("Link verifikasi berhasil ditemukan!");
         await executeActivation(email, foundLink);
 
       } catch (err) {
         log(`❌ ERROR: ${err.message}`);
       } finally {
         btn.disabled = false;
+        btn.innerText = "[ ⚡ PROSES AKTIVASI DARI INBOX ]";
       }
     }
 
     // HELPER EKSEKUSI API VERIFIKASI
     async function executeActivation(email, link) {
       log("[4/4] Memproses aktivasi Premium...");
-      log(`URL: ${link.substring(0, 45)}...`);
       const verifUrl = `${PROXY_BASE}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
-      await fetch(verifUrl);
+      await fetchWithTimeout(verifUrl);
 
       log("==========================================");
       log("🎉 SUKSES! Akun Premium Berhasil Aktif!");
@@ -399,7 +398,7 @@
 
       inboxView.value = "Memuat inbox...";
       try {
-        const res = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
+        const res = await fetchWithTimeout(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
         const data = await res.json();
         inboxView.value = JSON.stringify(data, null, 2);
       } catch (err) {
