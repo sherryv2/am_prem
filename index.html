@@ -114,6 +114,19 @@
       margin-top: 4px;
     }
 
+    .btn-action {
+      width: 100%;
+      padding: 8px;
+      background-color: #000080;
+      color: #ffffff;
+      border: 2px outset #ffffff;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
     button:active {
       border: 2px inset #ffffff;
     }
@@ -140,7 +153,7 @@
 
     .inbox-box {
       width: 100%;
-      height: 80px;
+      height: 70px;
       margin-top: 4px;
       background-color: #ffffff;
       color: #000000;
@@ -186,10 +199,11 @@
       <button id="btnCopy" class="btn-secondary" onclick="copyEmail()" disabled>[ 📋 COPY EMAIL ]</button>
     </fieldset>
 
-    <!-- INBOX VIEW -->
+    <!-- INBOX VIEW & RE-PROCESS -->
     <fieldset>
-      <legend>Akses Inbox Email (Minta Login)</legend>
+      <legend>Akses Inbox & Ekstraksi Manual</legend>
       <button id="btnCheckInbox" class="btn-secondary" onclick="checkInboxManual()" disabled>[ 📥 CEK PESAN MASUK ]</button>
+      <button id="btnProcessInbox" class="btn-action" onclick="processExistingInbox()" disabled>[ ⚡ PROSES AKTIVASI DARI INBOX ]</button>
       <textarea id="inboxView" class="inbox-box" readonly>[ Klik 'CEK PESAN MASUK' untuk membaca email... ]</textarea>
     </fieldset>
 
@@ -205,7 +219,6 @@
   </div>
 
   <script>
-    // Memakai Vercel Rewrite Proxy (/backend-api) agar bebas CORS
     const PROXY_BASE = window.location.hostname.includes('vercel.app') 
       ? '/backend-api' 
       : 'https://api.alwayscodex.eu.cc';
@@ -216,6 +229,22 @@
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
+    // Helper Ekstraksi Link Verifikasi
+    function extractLink(dataObj) {
+      if (!dataObj) return null;
+      let str = typeof dataObj === 'string' ? dataObj : JSON.stringify(dataObj);
+      
+      // Clean up common JSON escape characters
+      str = str.replace(/\\"/g, '"').replace(/\\/g, '');
+      
+      const match = str.match(/https?:\/\/[^\s"<'\\]*(alight|auth|creative)[^\s"<'\\]*/i);
+      if (match) {
+        return match[0].replace(/[">;,\s]+$/, '');
+      }
+      return null;
+    }
+
+    // PROSES OTOMATIS
     async function startFullAutomation() {
       const btn = document.getElementById('btnStart');
       const emailInput = document.getElementById('activeEmail');
@@ -226,54 +255,45 @@
       emailInput.value = "";
 
       try {
-        // STEP 1: Create Email
+        // 1. Create Email
         log("[1/4] Membuat temp email...");
-        const createUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=create`;
-        
-        const res1 = await fetch(createUrl);
+        const res1 = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=create`);
         const data1 = await res1.json();
 
-        // Mengambil email berdasarkan skema JSON: data1.result.email
         let createdEmail = data1.result ? data1.result.email : null;
-
-        if (!createdEmail) {
-          throw new Error("Gagal mengambil email dari response API.");
-        }
+        if (!createdEmail) throw new Error("Gagal mengambil email dari response API.");
 
         emailInput.value = createdEmail;
         document.getElementById('btnCopy').disabled = false;
         document.getElementById('btnCheckInbox').disabled = false;
+        document.getElementById('btnProcessInbox').disabled = false;
 
         log(`[1/4] Email berhasil dibuat: ${createdEmail}`);
 
-        // STEP 2: Send Link
+        // 2. Send Link
         log("[2/4] Mengirim request link verifikasi ke Alight Motion...");
-        const sendUrl = `${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`;
-        await fetch(sendUrl);
+        await fetch(`${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`);
         log("[2/4] Request berhasil dikirim.");
 
-        // STEP 3: Poll Inbox
-        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik)...");
+        // 3. Poll Inbox (Diperpanjang hingga 30x / 90 Detik)
+        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik, max 90 detik)...");
         let foundLink = null;
         let attempts = 0;
 
-        while (attempts < 10 && !foundLink) {
+        while (attempts < 30 && !foundLink) {
           attempts++;
           await new Promise(r => setTimeout(r, 3000));
 
           try {
-            const inboxUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`;
-            const resInbox = await fetch(inboxUrl);
+            const resInbox = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`);
             const dataInbox = await resInbox.json();
 
-            const str = JSON.stringify(dataInbox);
-            const match = str.match(/https?:\/\/[^\s"'\\]*(alight|auth)[^\s"'\\]*/i);
+            foundLink = extractLink(dataInbox);
 
-            if (match) {
-              foundLink = match[0].replace(/\\/g, '');
+            if (foundLink) {
               log(`[3/4] Link verifikasi ditemukan!`);
             } else {
-              log(`[3/4] Pengecekan ke-${attempts}... belum ada pesan.`);
+              log(`[3/4] Pengecekan ke-${attempts}/30... belum ada pesan.`);
             }
           } catch (e) {
             log(`[3/4] Mengulang pengecekan ke-${attempts}...`);
@@ -281,23 +301,59 @@
         }
 
         if (!foundLink) {
-          throw new Error("Pesan dari Alight Motion belum masuk. Silakan coba cek inbox manual nanti.");
+          log("⚠️ Waktu pengecekan habis. Jika email baru saja masuk di inbox, klik tombol '[ ⚡ PROSES DARI INBOX ]'.");
+          return;
         }
 
-        // STEP 4: Activate
-        log("[4/4] Memproses aktivasi Premium...");
-        const verifUrl = `${PROXY_BASE}/api/am/verifv2?email=${encodeURIComponent(createdEmail)}&link=${encodeURIComponent(foundLink)}`;
-        await fetch(verifUrl);
-
-        log("==========================================");
-        log("🎉 SUKSES! Akun Premium Berhasil Aktif!");
-        log("==========================================");
+        // 4. Activate
+        await executeActivation(createdEmail, foundLink);
 
       } catch (err) {
         log(`❌ ERROR: ${err.message}`);
       } finally {
         btn.disabled = false;
       }
+    }
+
+    // PROSES AKTIVASI DARI INBOX YANG SUDAH ADA (JIKA TERLAMBAT)
+    async function processExistingInbox() {
+      const email = document.getElementById('activeEmail').value.trim();
+      const btn = document.getElementById('btnProcessInbox');
+
+      if (!email) return alert("Belum ada email!");
+
+      btn.disabled = true;
+      log("Mengekstrak link dari inbox saat ini...");
+
+      try {
+        const res = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
+        const dataInbox = await res.json();
+
+        const foundLink = extractLink(dataInbox);
+
+        if (!foundLink) {
+          throw new Error("Link verifikasi belum ditemukan di dalam inbox. Coba 'CEK PESAN MASUK' terlebih dahulu.");
+        }
+
+        log("Link verifikasi ditemukan!");
+        await executeActivation(email, foundLink);
+
+      } catch (err) {
+        log(`❌ ERROR: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // HELPER EKSEKUSI API VERIFIKASI
+    async function executeActivation(email, link) {
+      log("[4/4] Memproses aktivasi Premium...");
+      const verifUrl = `${PROXY_BASE}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
+      await fetch(verifUrl);
+
+      log("==========================================");
+      log("🎉 SUKSES! Akun Premium Berhasil Aktif!");
+      log("==========================================");
     }
 
     async function checkInboxManual() {
@@ -308,8 +364,7 @@
 
       inboxView.value = "Memuat inbox...";
       try {
-        const inboxUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`;
-        const res = await fetch(inboxUrl);
+        const res = await fetch(`${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
         const data = await res.json();
         inboxView.value = JSON.stringify(data, null, 2);
       } catch (err) {
