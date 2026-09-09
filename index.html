@@ -183,7 +183,7 @@
       <span class="brand">adam.dev</span>
     </div>
 
-    <!-- 1-CLICK AUTOMATION -->
+    <!-- OTOMATISASI 1-KLIK -->
     <fieldset>
       <legend>Otomatisasi 1-Klik</legend>
       <button id="btnStart" class="btn-main" onclick="startFullAutomation()">[ 🚀 BUAT & AKTIFKAN AKUN ]</button>
@@ -199,7 +199,7 @@
       <button id="btnCopy" class="btn-secondary" onclick="copyEmail()" disabled>[ 📋 COPY EMAIL ]</button>
     </fieldset>
 
-    <!-- INBOX VIEW & RE-PROCESS -->
+    <!-- INBOX VIEW -->
     <fieldset>
       <legend>Akses Inbox & Ekstraksi Manual</legend>
       <button id="btnCheckInbox" class="btn-secondary" onclick="checkInboxManual()" disabled>[ 📥 CEK PESAN MASUK ]</button>
@@ -207,7 +207,7 @@
       <textarea id="inboxView" class="inbox-box" readonly>[ Klik 'CEK PESAN MASUK' untuk membaca email... ]</textarea>
     </fieldset>
 
-    <!-- LOG CONSOLE -->
+    <!-- CONSOLE LOG -->
     <fieldset>
       <legend>Console Log</legend>
       <textarea id="consoleLog" class="output-box" readonly>[ Ready. Klik 'BUAT & AKTIFKAN AKUN' untuk mulai. ]</textarea>
@@ -229,19 +229,32 @@
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    // Helper Ekstraksi Link Verifikasi
+    // FUNGSI EKSTRAKSI LINK ULTRA-RESPONSIF
     function extractLink(dataObj) {
       if (!dataObj) return null;
-      let str = typeof dataObj === 'string' ? dataObj : JSON.stringify(dataObj);
-      
-      // Clean up common JSON escape characters
-      str = str.replace(/\\"/g, '"').replace(/\\/g, '');
-      
-      const match = str.match(/https?:\/\/[^\s"<'\\]*(alight|auth|creative)[^\s"<'\\]*/i);
-      if (match) {
-        return match[0].replace(/[">;,\s]+$/, '');
+
+      let rawStr = typeof dataObj === 'string' ? dataObj : JSON.stringify(dataObj);
+
+      // Bersihkan escape karakter tanpa merusak URL
+      rawStr = rawStr.replace(/\\r|\\n/g, ' ').replace(/\\/g, '');
+
+      // Cari semua pola URL https:// atau http://
+      const urlMatches = rawStr.match(/https?:\/\/[^\s"'<>\\]+/gi);
+      if (!urlMatches || urlMatches.length === 0) return null;
+
+      // Filter kandidat link verifikasi
+      for (let url of urlMatches) {
+        let cleanUrl = url.replace(/["'}>;,\]]+$/, '').replace(/&amp;/g, '&');
+
+        // Prioritas link yang mengandung domain/path Alight Motion
+        if (cleanUrl.includes('alight') || cleanUrl.includes('auth') || cleanUrl.includes('firebase') || cleanUrl.includes('creative')) {
+          return cleanUrl;
+        }
       }
-      return null;
+
+      // Fallback: Ambil URL terpanjang dalam email (karena link verifikasi berisi token panjang)
+      urlMatches.sort((a, b) => b.length - a.length);
+      return urlMatches[0].replace(/["'}>;,\]]+$/, '').replace(/&amp;/g, '&');
     }
 
     // PROSES OTOMATIS
@@ -275,12 +288,12 @@
         await fetch(`${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`);
         log("[2/4] Request berhasil dikirim.");
 
-        // 3. Poll Inbox (Diperpanjang hingga 30x / 90 Detik)
-        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik, max 90 detik)...");
+        // 3. Poll Inbox
+        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik)...");
         let foundLink = null;
         let attempts = 0;
 
-        while (attempts < 30 && !foundLink) {
+        while (attempts < 25 && !foundLink) {
           attempts++;
           await new Promise(r => setTimeout(r, 3000));
 
@@ -291,9 +304,9 @@
             foundLink = extractLink(dataInbox);
 
             if (foundLink) {
-              log(`[3/4] Link verifikasi ditemukan!`);
+              log(`[3/4] Link verifikasi berhasil diekstrak!`);
             } else {
-              log(`[3/4] Pengecekan ke-${attempts}/30... belum ada pesan.`);
+              log(`[3/4] Pengecekan ke-${attempts}/25... belum ada pesan.`);
             }
           } catch (e) {
             log(`[3/4] Mengulang pengecekan ke-${attempts}...`);
@@ -301,7 +314,7 @@
         }
 
         if (!foundLink) {
-          log("⚠️ Waktu pengecekan habis. Jika email baru saja masuk di inbox, klik tombol '[ ⚡ PROSES DARI INBOX ]'.");
+          log("⚠️ Waktu pengecekan habis. Jika email baru masuk, klik tombol '[ ⚡ PROSES DARI INBOX ]'.");
           return;
         }
 
@@ -315,7 +328,7 @@
       }
     }
 
-    // PROSES AKTIVASI DARI INBOX YANG SUDAH ADA (JIKA TERLAMBAT)
+    // EKSTRAKSI DARI INBOX
     async function processExistingInbox() {
       const email = document.getElementById('activeEmail').value.trim();
       const btn = document.getElementById('btnProcessInbox');
@@ -332,10 +345,10 @@
         const foundLink = extractLink(dataInbox);
 
         if (!foundLink) {
-          throw new Error("Link verifikasi belum ditemukan di dalam inbox. Coba 'CEK PESAN MASUK' terlebih dahulu.");
+          throw new Error("Link verifikasi belum ditemukan di dalam inbox.");
         }
 
-        log("Link verifikasi ditemukan!");
+        log("Link verifikasi berhasil diekstrak!");
         await executeActivation(email, foundLink);
 
       } catch (err) {
