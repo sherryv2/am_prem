@@ -3,144 +3,282 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AM.HOSTING // CUSTOM API</title>
+  <title>Alight Motion Premium Activator</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&display=swap');
-    
+    :root {
+      --bg-color: #0d0f12;
+      --card-bg: #161920;
+      --border-color: #262b36;
+      --primary-color: #22c55e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --input-bg: #0d0f12;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: #fff4e6;
+      background-color: var(--bg-color);
+      color: var(--text-main);
       display: flex;
       justify-content: center;
-      padding: 50px 20px;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    .card {
-      background: #fff;
-      border: 3px solid #000;
-      box-shadow: 6px 6px 0px #000;
-      padding: 2rem;
-      max-width: 450px;
+    .container {
       width: 100%;
+      max-width: 480px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
-    h1 {
-      background: #ffe600;
-      border: 3px solid #000;
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .status-badge {
       display: inline-block;
-      padding: 4px 8px;
-      box-shadow: 3px 3px 0px #000;
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-color);
     }
 
-    input[type="file"] {
-      border: 3px solid #000;
-      padding: 10px;
+    .header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .step-card {
+      border: 1px solid var(--border-color);
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
       width: 100%;
-      margin-bottom: 1rem;
-      box-sizing: border-box;
-      background: #fff;
+      padding: 10px 12px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary-color);
     }
 
     button {
       width: 100%;
-      background: #00f0ff;
-      border: 3px solid #000;
-      padding: 12px;
-      font-weight: 900;
-      font-family: inherit;
+      padding: 10px;
+      background-color: var(--primary-color);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 4px 4px 0px #000;
-      text-transform: uppercase;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
     }
 
     button:hover {
-      background: #ff6b8b;
-      transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0px #000;
+      opacity: 0.9;
     }
 
-    .result {
-      margin-top: 1.5rem;
-      padding: 12px;
-      background: #00e676;
-      border: 3px solid #000;
-      box-shadow: 3px 3px 0px #000;
+    button:disabled {
+      background-color: #4b5563;
+      cursor: not-allowed;
+    }
+
+    .result-box {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
       display: none;
       word-break: break-all;
     }
 
-    img {
-      max-width: 100%;
-      margin-top: 10px;
-      border: 2px solid #000;
+    .result-box.success {
+      background-color: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+
+    .result-box.error {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
     }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>IMAGE TO LINK</h1>
-  <form id="uploadForm">
-    <input type="file" id="imageInput" accept="image/*" required>
-    <button type="submit" id="btnSubmit">GENERATE LINK</button>
-  </form>
+  <div class="container">
+    <div class="header">
+      <h1><span class="status-badge"></span> AlwaysCodex AM Premium</h1>
+      <p>Aktivasi Alight Motion Premium via Email Link</p>
+    </div>
 
-  <div id="resultBox" class="result">
-    <p><strong>URL GAMBAR PUBLIC:</strong></p>
-    <a id="imageUrl" href="" target="_blank" style="color: #000;"></a>
-    <br><br>
-    <img id="imagePreview" src="" alt="Preview">
+    <!-- LANGKAH 1: Send Link -->
+    <div class="step-card">
+      <div class="step-title">1. Kirim Link Verifikasi</div>
+      <div class="form-group">
+        <label for="sendEmail">Email *</label>
+        <input type="email" id="sendEmail" placeholder="user@email.com" required>
+      </div>
+      <button id="btnSend" onclick="sendVerificationLink()">Kirim Email Verifikasi</button>
+      <div id="sendResult" class="result-box"></div>
+    </div>
+
+    <!-- LANGKAH 2: Verify Link -->
+    <div class="step-card">
+      <div class="step-title">2. Verifikasi & Apply Premium</div>
+      <div class="form-group">
+        <label for="verifEmail">Email *</label>
+        <input type="email" id="verifEmail" placeholder="user@email.com" required>
+      </div>
+      <div class="form-group">
+        <label for="verifLink">Link Verifikasi dari Email *</label>
+        <input type="text" id="verifLink" placeholder="https://alightcreative.com/auth_..." required>
+      </div>
+      <button id="btnVerif" onclick="verifyAndApply()">Aktifkan Premium</button>
+      <div id="verifResult" class="result-box"></div>
+    </div>
   </div>
-</div>
 
-<script>
-  const API_URL = "https://api.alwayscodex.eu.cc/api/tools/upload2";
+  <script>
+    const BASE_URL = 'https://api.alwayscodex.eu.cc';
 
-  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fileInput = document.getElementById('imageInput');
-    const btn = document.getElementById('btnSubmit');
-    const resultBox = document.getElementById('resultBox');
+    // Auto samakan input email di langkah 2 jika user mengetik di langkah 1
+    document.getElementById('sendEmail').addEventListener('input', function(e) {
+      document.getElementById('verifEmail').value = e.target.value;
+    });
 
-    const file = fileInput.files[0];
-    if (!file) return;
+    // Fungsi untuk API 1: /api/am/sendv2
+    async function sendVerificationLink() {
+      const email = document.getElementById('sendEmail').value.trim();
+      const btn = document.getElementById('btnSend');
+      const resultBox = document.getElementById('sendResult');
 
-    btn.disabled = true;
-    btn.innerText = "UPLOADING TO API...";
-
-    const formData = new FormData();
-    // Menggunakan key 'file' atau 'image' sesuai standar API multipart
-    formData.append('file', file);
-
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-
-      // Mengecek respons URL dari API (menyesuaikan struktur json return)
-      const resultUrl = data.url || data.result || data.link || (data.data && data.data.url);
-
-      if (resultUrl) {
-        document.getElementById('imageUrl').href = resultUrl;
-        document.getElementById('imageUrl').innerText = resultUrl;
-        document.getElementById('imagePreview').src = resultUrl;
-        resultBox.style.display = 'block';
-      } else {
-        alert("Upload gagal atau format respons API tidak dikenali: " + JSON.stringify(data));
+      if (!email) {
+        showResult(resultBox, 'Silakan masukkan email!', 'error');
+        return;
       }
-    } catch (err) {
-      alert("Error menghubungi API: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "GENERATE LINK";
-    }
-  });
-</script>
 
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+      resultBox.style.display = 'none';
+
+      try {
+        // Menggunakan method GET (sesuai dokumentasi)
+        const response = await fetch(`${BASE_URL}/api/am/sendv2?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          showResult(resultBox, data.message || JSON.stringify(data), 'success');
+        } else {
+          showResult(resultBox, data.message || 'Gagal mengirim email.', 'error');
+        }
+      } catch (err) {
+        showResult(resultBox, 'Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirim Email Verifikasi';
+      }
+    }
+
+    // Fungsi untuk API 2: /api/am/verifv2
+    async function verifyAndApply() {
+      const email = document.getElementById('verifEmail').value.trim();
+      const link = document.getElementById('verifLink').value.trim();
+      const btn = document.getElementById('btnVerif');
+      const resultBox = document.getElementById('verifResult');
+
+      if (!email || !link) {
+        showResult(resultBox, 'Email dan Link wajib diisi!', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Memproses Aktivasi...';
+      resultBox.style.display = 'none';
+
+      try {
+        // Menggunakan method GET dengan parameter email & link
+        const url = `${BASE_URL}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+          showResult(resultBox, data.message || 'Berhasil! Premium telah aktif.', 'success');
+        } else {
+          showResult(resultBox, data.message || 'Gagal memverifikasi link.', 'error');
+        }
+      } catch (err) {
+        showResult(resultBox, 'Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Aktifkan Premium';
+      }
+    }
+
+    // Helper untuk menampilkan notifikasi hasil
+    function showResult(element, text, type) {
+      element.className = `result-box ${type}`;
+      element.textContent = text;
+      element.style.display = 'block';
+    }
+  </script>
 </body>
 </html>
