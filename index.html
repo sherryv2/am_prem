@@ -194,14 +194,14 @@
       <legend>Detail Akun Terbuat</legend>
       <div class="form-group">
         <label for="activeEmail">EMAIL AKUN AM PREMIUM:</label>
-        <input type="email" id="activeEmail" placeholder="Ketik/Paste atau klik buat otomatis...">
+        <input type="email" id="activeEmail" placeholder="Belum ada akun terbuat...">
       </div>
       <button id="btnCopy" class="btn-secondary" onclick="copyEmail()">[ 📋 COPY EMAIL ]</button>
     </fieldset>
 
-    <!-- INBOX & MANUAL LINK -->
+    <!-- INBOX VIEW -->
     <fieldset>
-      <legend>Akses Inbox & Paste Link Manual</legend>
+      <legend>Akses Inbox & Link Manual</legend>
       <button id="btnCheckInbox" class="btn-secondary" onclick="checkInboxManual()">[ 📥 CEK PESAN MASUK ]</button>
       <button id="btnProcessInbox" class="btn-action" onclick="processExistingInbox()">[ ⚡ PROSES DARI INBOX ]</button>
       <textarea id="inboxView" class="inbox-box" readonly>[ Klik 'CEK PESAN MASUK' untuk membaca email... ]</textarea>
@@ -225,160 +225,160 @@
   </div>
 
   <script>
-    const TARGET_API = 'https://api.alwayscodex.eu.cc';
+    // Tangkap error tak terduga di browser dan tampilkan di console box
+    window.onerror = function(msg, url, line) {
+      var consoleBox = document.getElementById('consoleLog');
+      if (consoleBox) {
+        consoleBox.value += "\n> ❌ SCRIPT ERROR: " + msg + " (line " + line + ")";
+      }
+    };
+
+    var API_HOST = 'https://api.alwayscodex.eu.cc';
 
     function log(msg) {
-      const consoleBox = document.getElementById('consoleLog');
-      consoleBox.value += `\n> ${msg}`;
+      var consoleBox = document.getElementById('consoleLog');
+      consoleBox.value += "\n> " + msg;
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    // MULTI-FALLBACK FETCH ENGINE (Anti-CORS & Anti-Stuck)
-    async function fetchRobust(url) {
-      // 1. Direct fetch
-      try {
-        const res = await fetch(url);
-        if (res.ok) {
-          const text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
-        }
-      } catch(e) {}
+    // Engine panggil API Multi-Fallback
+    async function fetchData(endpoint) {
+      var directUrl = API_HOST + endpoint;
 
-      // 2. Vercel Rewrite Proxy
-      if (window.location.hostname.includes('vercel.app')) {
+      // 1. Jika di Vercel, pakai rewrite proxy
+      if (window.location.hostname.indexOf('vercel.app') !== -1) {
         try {
-          const proxyPath = url.replace(TARGET_API, '/backend-api');
-          const res = await fetch(proxyPath);
-          if (res.ok) {
-            const text = await res.text();
-            try { return JSON.parse(text); } catch(e) { return text; }
+          var proxyPath = endpoint.replace('/api/', '/backend-api/api/');
+          if (endpoint.indexOf('/backend-api') === 0) proxyPath = endpoint;
+          else proxyPath = '/backend-api' + endpoint;
+
+          var res1 = await fetch(proxyPath);
+          if (res1.ok) {
+            var text1 = await res1.text();
+            try { return JSON.parse(text1); } catch(e) { return text1; }
           }
         } catch(e) {}
       }
 
-      // 3. CORS Proxy IO
+      // 2. Direct Call
       try {
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-        const res = await fetch(proxyUrl);
-        if (res.ok) {
-          const text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
+        var res2 = await fetch(directUrl);
+        if (res2.ok) {
+          var text2 = await res2.text();
+          try { return JSON.parse(text2); } catch(e) { return text2; }
         }
       } catch(e) {}
 
-      // 4. AllOrigins Proxy
+      // 3. Fallback CORS Proxy
       try {
-        const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const res = await fetch(proxyUrl2);
-        if (res.ok) {
-          const text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
+        var corsUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
+        var res3 = await fetch(corsUrl);
+        if (res3.ok) {
+          var text3 = await res3.text();
+          try { return JSON.parse(text3); } catch(e) { return text3; }
         }
       } catch(e) {}
 
-      throw new Error("Gagal terhubung ke API. Periksa koneksi internet Anda.");
+      throw new Error("Gagal terhubung ke API. Periksa jaringan internet.");
     }
 
-    // EXTRACTION LINK VERIFIKASI ALIGHT CREATIVE
+    // Ekstraksi Link Verifikasi Aman (Tanpa RegEx Crash)
     function extractLinkFromInbox(dataInbox) {
       if (!dataInbox) return null;
-      let str = typeof dataInbox === 'string' ? dataInbox : JSON.stringify(dataInbox);
+      var str = typeof dataInbox === 'string' ? dataInbox : JSON.stringify(dataInbox);
 
-      // Clean HTML & escaped characters
+      // Clean characters
       str = str.replace(/\\\/g, '/')
-               .replace(/\\n/gi, ' ')
-               .replace(/\\r/gi, ' ')
                .replace(/\\"/g, '"')
+               .replace(/\\n/g, ' ')
+               .replace(/\\r/g, ' ')
                .replace(/=3D/gi, '=')
                .replace(/=\r?\n/g, '')
-               .replace(/&amp;/g, '&')
-               .replace(/&quot;/g, '"')
-               .replace(/&lt;/g, '<')
-               .replace(/&gt;/g, '>');
+               .replace(/&amp;/g, '&');
 
-      // Find all URLs
-      const urls = str.match(/https?:\/\/[^\s"'<>\\\]\[\}(\)]+/gi) || [];
+      // Ambil semua URL berbasis http/https
+      var urls = str.match(/https?:\/\/[^\s"'<>]+/gi) || [];
 
-      for (let u of urls) {
-        let clean = u.replace(/["';,>)]+$/, '');
-        let lower = clean.toLowerCase();
+      for (var i = 0; i < urls.length; i++) {
+        var clean = urls[i].replace(/[";,>)\.]+$/, '');
+        var lower = clean.toLowerCase();
 
-        if ((lower.includes('alight') || lower.includes('firebase') || lower.includes('oobcode') || lower.includes('auth')) &&
-            !lower.includes('alwayscodex') && !lower.includes('1timetech') && !lower.includes('corsproxy') && !lower.includes('allorigins') && !lower.includes('vercel')) {
+        if ((lower.indexOf('alight') !== -1 || lower.indexOf('firebase') !== -1 || lower.indexOf('oobcode') !== -1 || lower.indexOf('auth') !== -1) &&
+            lower.indexOf('alwayscodex') === -1 && lower.indexOf('1timetech') === -1 && lower.indexOf('vercel') === -1) {
           return clean;
         }
       }
 
-      for (let u of urls) {
-        let clean = u.replace(/["';,>)]+$/, '');
-        let lower = clean.toLowerCase();
-        if ((lower.includes('oobcode') || lower.includes('mode=') || lower.includes('signin')) &&
-            !lower.includes('alwayscodex') && !lower.includes('1timetech')) {
-          return clean;
+      for (var j = 0; j < urls.length; j++) {
+        var clean2 = urls[j].replace(/[";,>)\.]+$/, '');
+        var lower2 = clean2.toLowerCase();
+        if ((lower2.indexOf('oobcode') !== -1 || lower2.indexOf('mode=') !== -1 || lower2.indexOf('signin') !== -1) &&
+            lower2.indexOf('alwayscodex') === -1 && lower2.indexOf('1timetech') === -1) {
+          return clean2;
         }
       }
 
       return null;
     }
 
-    // 1. AUTOMATION
+    // 1. AUTOMATION UTAMA
     async function startFullAutomation() {
-      const btn = document.getElementById('btnStart');
-      const emailInput = document.getElementById('activeEmail');
+      var btn = document.getElementById('btnStart');
+      var emailInput = document.getElementById('activeEmail');
 
       btn.disabled = true;
-      btn.innerText = "[ ⏳ SEDANG MEMPROSES... ]";
-      log("Memulai proses otomatisasi...");
+      btn.innerText = "[ ⏳ MEMPROSES... ]";
+      log("Memulai otomatisasi...");
 
       try {
         // Step 1: Create Email
-        log("[1/4] Membuat email temporary baru...");
-        const data1 = await fetchRobust(`${TARGET_API}/api/tempmail/1timetech?action=create`);
+        log("[1/4] Membuat temp email...");
+        var data1 = await fetchData('/api/tempmail/1timetech?action=create');
         
-        let createdEmail = null;
-        if (typeof data1 === 'object') {
+        var createdEmail = null;
+        if (typeof data1 === 'object' && data1 !== null) {
           if (data1.result && data1.result.email) createdEmail = data1.result.email;
           else if (data1.email) createdEmail = data1.email;
         }
 
-        if (!createdEmail) throw new Error("Gagal membuat email temporary.");
+        if (!createdEmail) throw new Error("Gagal mengambil email baru dari server.");
 
         emailInput.value = createdEmail;
-        log(`[1/4] Email berhasil dibuat: ${createdEmail}`);
+        log("[1/4] Email berhasil dibuat: " + createdEmail);
 
         // Step 2: Request Link
-        log("[2/4] Mengirim request verifikasi Alight Motion...");
-        await fetchRobust(`${TARGET_API}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`);
-        log("[2/4] Link verifikasi berhasil dikirim ke email!");
+        log("[2/4] Mengirim request verifikasi ke Alight Motion...");
+        await fetchData('/api/am/sendv2?email=' + encodeURIComponent(createdEmail));
+        log("[2/4] Request verifikasi terkirim!");
 
         // Step 3: Poll Inbox
-        log("[3/4] Menunggu pesan di inbox (auto-check 10x)...");
-        let foundLink = null;
-        let attempts = 0;
+        log("[3/4] Menunggu pesan masuk di inbox (auto-check 8x)...");
+        var foundLink = null;
+        var attempts = 0;
 
-        while (attempts < 10 && !foundLink) {
+        while (attempts < 8 && !foundLink) {
           attempts++;
-          await new Promise(r => setTimeout(r, 3000));
+          await new Promise(function(r) { setTimeout(r, 3000); });
 
           try {
-            const dataInbox = await fetchRobust(`${TARGET_API}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`);
+            var dataInbox = await fetchData('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(createdEmail));
             document.getElementById('inboxView').value = typeof dataInbox === 'object' ? JSON.stringify(dataInbox, null, 2) : dataInbox;
 
             foundLink = extractLinkFromInbox(dataInbox);
 
             if (foundLink) {
-              log("[3/4] Link verifikasi berhasil diekstrak dari pesan!");
+              log("[3/4] Link verifikasi ditemukan!");
               document.getElementById('manualLink').value = foundLink;
             } else {
-              log(`[3/4] Check ke-${attempts}/10... membaca inbox.`);
+              log("[3/4] Check ke-" + attempts + "/8... membaca pesan.");
             }
           } catch(e) {
-            log(`[3/4] Check ke-${attempts}... mengulang.`);
+            log("[3/4] Check ke-" + attempts + "... mengulang.");
           }
         }
 
         if (!foundLink) {
-          log("⚠️ Pengecekan otomatis selesai. Jika email sudah masuk di bawah, klik '[ ⚡ PROSES DARI INBOX ]'.");
+          log("⚠️ Auto-check selesai. Jika email sudah masuk di bawah, klik '[ ⚡ PROSES DARI INBOX ]'.");
           return;
         }
 
@@ -386,7 +386,7 @@
         await executeActivation(createdEmail, foundLink);
 
       } catch(err) {
-        log(`❌ ERROR: ${err.message}`);
+        log("❌ ERROR: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "[ 🚀 BUAT & AKTIFKAN AKUN ]";
@@ -395,54 +395,53 @@
 
     // 2. CHECK INBOX MANUAL
     async function checkInboxManual() {
-      const email = document.getElementById('activeEmail').value.trim();
-      const inboxView = document.getElementById('inboxView');
+      var email = document.getElementById('activeEmail').value.trim();
+      var inboxView = document.getElementById('inboxView');
 
-      if (!email) return alert("Harap isi atau buat email terlebih dahulu!");
+      if (!email) return alert("Isi atau buat email terlebih dahulu!");
 
       inboxView.value = "Memuat isi inbox...";
-      log(`Mengecek inbox untuk email: ${email}`);
+      log("Mengecek inbox untuk: " + email);
 
       try {
-        const data = await fetchRobust(`${TARGET_API}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
+        var data = await fetchData('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(email));
         inboxView.value = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
 
-        const link = extractLinkFromInbox(data);
+        var link = extractLinkFromInbox(data);
         if (link) {
           document.getElementById('manualLink').value = link;
-          log("Link verifikasi terdeteksi dan diisi otomatis!");
+          log("Link verifikasi terdeteksi!");
         } else {
-          log("Pesan inbox dimuat. Belum ada link terdeteksi.");
+          log("Pesan inbox dimuat. Belum ada link.");
         }
       } catch(err) {
         inboxView.value = "Gagal membaca inbox.";
-        log(`❌ ERROR: ${err.message}`);
+        log("❌ ERROR: " + err.message);
       }
     }
 
     // 3. PROSES DARI INBOX
     async function processExistingInbox() {
-      const email = document.getElementById('activeEmail').value.trim();
-      const btn = document.getElementById('btnProcessInbox');
+      var email = document.getElementById('activeEmail').value.trim();
+      var btn = document.getElementById('btnProcessInbox');
 
-      if (!email) return alert("Harap isi atau buat email terlebih dahulu!");
+      if (!email) return alert("Isi atau buat email terlebih dahulu!");
 
       btn.disabled = true;
       btn.innerText = "[ ⏳ MEMPROSES... ]";
-      log("Mengekstrak link dari inbox...");
 
       try {
-        const dataInbox = await fetchRobust(`${TARGET_API}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`);
+        var dataInbox = await fetchData('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(email));
         document.getElementById('inboxView').value = typeof dataInbox === 'object' ? JSON.stringify(dataInbox, null, 2) : dataInbox;
 
-        const foundLink = extractLinkFromInbox(dataInbox);
-        if (!foundLink) throw new Error("Link verifikasi belum terdeteksi. Silakan tekan 'CEK PESAN MASUK'.");
+        var foundLink = extractLinkFromInbox(dataInbox);
+        if (!foundLink) throw new Error("Link belum terdeteksi. Silakan tekan 'CEK PESAN MASUK'.");
 
         document.getElementById('manualLink').value = foundLink;
         await executeActivation(email, foundLink);
 
       } catch(err) {
-        log(`❌ ERROR: ${err.message}`);
+        log("❌ ERROR: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "[ ⚡ PROSES DARI INBOX ]";
@@ -451,25 +450,24 @@
 
     // 4. MANUAL LINK ACTIVATION
     async function executeManualLink() {
-      const email = document.getElementById('activeEmail').value.trim();
-      const link = document.getElementById('manualLink').value.trim();
+      var email = document.getElementById('activeEmail').value.trim();
+      var link = document.getElementById('manualLink').value.trim();
 
       if (!email || !link) return alert("Email dan Link verifikasi wajib diisi!");
 
-      log("Memproses aktivasi via link manual...");
+      log("Memproses aktivasi via link...");
       await executeActivation(email, link);
     }
 
     // 5. ACTIVATION EXECUTION
     async function executeActivation(email, link) {
       log("[4/4] Memproses aktivasi Premium...");
-      const verifUrl = `${TARGET_API}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
+      var verifEndpoint = '/api/am/verifv2?email=' + encodeURIComponent(email) + '&link=' + encodeURIComponent(link);
 
       try {
-        await fetchRobust(verifUrl);
+        await fetchData(verifEndpoint);
       } catch(e) {
-        // Fallback send if proxy blocks response
-        await fetch(verifUrl, { mode: 'no-cors' });
+        await fetch(API_HOST + verifEndpoint, { mode: 'no-cors' });
       }
 
       log("==========================================");
@@ -478,9 +476,15 @@
     }
 
     function copyEmail() {
-      const emailInput = document.getElementById('activeEmail');
+      var emailInput = document.getElementById('activeEmail');
       if (!emailInput.value) return alert("Email kosong!");
-      navigator.clipboard.writeText(emailInput.value);
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(emailInput.value);
+      } else {
+        emailInput.select();
+        document.execCommand('copy');
+      }
       alert("Email berhasil di-copy!");
     }
   </script>
