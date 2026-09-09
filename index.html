@@ -79,7 +79,8 @@
     }
 
     input[type="text"],
-    input[type="email"] {
+    input[type="email"],
+    select {
       width: 100%;
       padding: 6px;
       border: 2px inset #ffffff;
@@ -100,8 +101,6 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 4px;
-      -webkit-appearance: none;
-      border-radius: 0;
     }
 
     .btn-secondary {
@@ -168,6 +167,17 @@
       <span class="brand">adam.dev</span>
     </div>
 
+    <!-- PENGATURAN MAIL PROVIDER -->
+    <fieldset>
+      <legend>Provider Email</legend>
+      <div class="form-group">
+        <select id="mailProvider">
+          <option value="boomlify">Boomlify (Full HTML Mail - Recommended)</option>
+          <option value="1timetech">1TimeTech (Snippet Mail)</option>
+        </select>
+      </div>
+    </fieldset>
+
     <!-- OTOMATISASI 1-KLIK -->
     <fieldset>
       <legend>Otomatisasi 1-Klik</legend>
@@ -220,11 +230,14 @@
       }
     }
 
-    // Ambil Data API Bebas CORS
+    function getProvider() {
+      var p = document.getElementById('mailProvider');
+      return p ? p.value : 'boomlify';
+    }
+
     function apiFetch(endpoint, callback) {
       var targetUrl = API_HOST + endpoint;
       
-      // Jika di Vercel, arahkan ke proxy backend
       if (window.location.hostname.indexOf('vercel.app') !== -1) {
         targetUrl = '/backend-api' + endpoint;
       }
@@ -232,14 +245,9 @@
       fetch(targetUrl)
         .then(function(res) { return res.text(); })
         .then(function(text) {
-          try {
-            callback(null, JSON.parse(text));
-          } catch(e) {
-            callback(null, text);
-          }
+          try { callback(null, JSON.parse(text)); } catch(e) { callback(null, text); }
         })
         .catch(function(err) {
-          // Fallback ke CorsProxy jika direct fetch diblokir
           var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(API_HOST + endpoint);
           fetch(proxyUrl)
             .then(function(res) { return res.text(); })
@@ -252,50 +260,48 @@
         });
     }
 
-    // Fungsi Ekstraksi Link Sederhana (Tanpa RegEx Kompleks)
-    function findLinkInString(str) {
-      if (!str) return null;
-      if (typeof str !== 'string') str = JSON.stringify(str);
+    // Ekstraksi Link Menggunakan Regex Rekursif Lengkap
+    function findLinkInObject(obj) {
+      if (!obj) return null;
+      var str = typeof obj === 'string' ? obj : JSON.stringify(obj);
 
-      // Clean String
+      // Clean unescaped slashes & HTML codes
       str = str.split('\\/').join('/')
                .split('\\"').join('"')
                .split('\\n').join(' ')
                .split('=3D').join('=')
-               .split('&amp;').join('&');
+               .split('&amp;').join('&')
+               .split('&quot;').join('"');
 
-      var words = str.split(' ');
-      for (var i = 0; i < words.length; i++) {
-        var w = words[i];
-        if (w.indexOf('http://') !== -1 || w.indexOf('https://') !== -1) {
-          // Potong karakter pembungkus
-          var cleanUrl = w.replace(/^[^h]+/, '').replace(/["';,>)\.]+$/, '');
-          var lower = cleanUrl.toLowerCase();
-          
-          if ((lower.indexOf('alight') !== -1 || lower.indexOf('firebase') !== -1 || lower.indexOf('oobcode') !== -1 || lower.indexOf('auth') !== -1) &&
-              lower.indexOf('alwayscodex') === -1 && lower.indexOf('1timetech') === -1) {
-            return cleanUrl;
-          }
+      var matches = str.match(/https?:\/\/[^\s"'<>\\\]\[\}(\)]+/gi) || [];
+
+      for (var i = 0; i < matches.length; i++) {
+        var cleanUrl = matches[i].replace(/[";,>)\.]+$/, '');
+        var lower = cleanUrl.toLowerCase();
+
+        if ((lower.indexOf('alight') !== -1 || lower.indexOf('firebase') !== -1 || lower.indexOf('oobcode') !== -1 || lower.indexOf('auth') !== -1) &&
+            lower.indexOf('alwayscodex') === -1 && lower.indexOf('1timetech') === -1 && lower.indexOf('boomlify') === -1) {
+          return cleanUrl;
         }
       }
       return null;
     }
 
-    // 1. EKSKUSI UTAMA (TOMBOL HIJAU)
+    // PROSES UTAMA
     function handleStartAutomation() {
       var btn = document.getElementById('btnStart');
       var emailInput = document.getElementById('activeEmail');
+      var provider = getProvider();
 
-      // RESPON VISUAL INSTAN SEKETIKA DIKLIK
       btn.disabled = true;
       btn.innerText = "[ ⏳ MEMPROSES... ]";
       btn.style.backgroundColor = "#555555";
       
-      document.getElementById('consoleLog').value = "[ PROSES DIMULAI ]";
-      writeLog("Tombol diklik! Menghubungi server email...");
+      document.getElementById('consoleLog').value = "[ PROSES DIMULAI - Provider: " + provider + " ]";
+      writeLog("Menghubungi server tempmail...");
 
       // Step 1: Create Email
-      apiFetch('/api/tempmail/1timetech?action=create', function(err1, data1) {
+      apiFetch('/api/tempmail/' + provider + '?action=create', function(err1, data1) {
         if (err1) {
           writeLog("❌ Gagal terhubung ke API TempMail.");
           resetStartButton();
@@ -309,36 +315,48 @@
         }
 
         if (!newEmail) {
-          writeLog("❌ Gagal mendapatkan email dari server.");
+          writeLog("❌ Gagal mendapatkan email baru.");
           resetStartButton();
           return;
         }
 
         emailInput.value = newEmail;
-        writeLog("[1/4] Email berhasil dibuat: " + newEmail);
+        writeLog("[1/4] Email dibuat: " + newEmail);
 
         // Step 2: Send Link
         writeLog("[2/4] Mengirim request verifikasi ke Alight Motion...");
         apiFetch('/api/am/sendv2?email=' + encodeURIComponent(newEmail), function(err2, data2) {
           writeLog("[2/4] Request verifikasi terkirim!");
 
-          // Step 3: Poll Inbox (Check 6x = ~18 detik)
-          writeLog("[3/4] Menunggu email masuk ke inbox...");
+          // Step 3: Poll Inbox
+          writeLog("[3/4] Menunggu email masuk (auto-check 8x)...");
           var attempts = 0;
-          var maxAttempts = 6;
+          var maxAttempts = 8;
 
           var pollInterval = setInterval(function() {
             attempts++;
-            writeLog("[3/4] Mengecek inbox (ke-" + attempts + "/" + maxAttempts + ")...");
+            writeLog("[3/4] Mengecek inbox (" + attempts + "/" + maxAttempts + ")...");
 
-            apiFetch('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(newEmail), function(errInbox, dataInbox) {
+            apiFetch('/api/tempmail/' + provider + '?action=inbox&email=' + encodeURIComponent(newEmail), function(errInbox, dataInbox) {
               if (dataInbox) {
                 document.getElementById('inboxView').value = typeof dataInbox === 'object' ? JSON.stringify(dataInbox, null, 2) : dataInbox;
                 
-                var foundLink = findLinkInString(dataInbox);
+                var foundLink = findLinkInObject(dataInbox);
+
+                // Jika 1timetech terpotong, coba panggil detail ID
+                if (!foundLink && provider === '1timetech' && dataInbox.result && dataInbox.result.length > 0) {
+                  var msgId = dataInbox.result[0].id || dataInbox.result[0].mailId;
+                  if (msgId) {
+                    apiFetch('/api/tempmail/1timetech?action=read&id=' + encodeURIComponent(msgId), function(eR, dR) {
+                      var linkDetail = findLinkInObject(dR);
+                      if (linkDetail) foundLink = linkDetail;
+                    });
+                  }
+                }
+
                 if (foundLink) {
                   clearInterval(pollInterval);
-                  writeLog("[3/4] Link verifikasi ditemukan!");
+                  writeLog("[3/4] Link verifikasi berhasil ditemukan!");
                   document.getElementById('manualLink').value = foundLink;
 
                   // Step 4: Activate
@@ -357,7 +375,7 @@
                 writeLog("⚠️ Pengecekan otomatis selesai. Jika pesan masuk, klik '[ ⚡ PROSES DARI INBOX ]'.");
                 resetStartButton();
               }
-            });
+            }, 3000);
           }, 3000);
         });
       });
@@ -370,34 +388,34 @@
       btn.style.backgroundColor = "#008000";
     }
 
-    // 2. CEK INBOX MANUAL
     function handleCheckInbox() {
       var email = document.getElementById('activeEmail').value.trim();
-      if (!email) return alert("Harap isi atau buat email dulu!");
+      var provider = getProvider();
+      if (!email) return alert("Isi atau buat email terlebih dahulu!");
 
       writeLog("Mengecek inbox...");
-      apiFetch('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
+      apiFetch('/api/tempmail/' + provider + '?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
         if (err) return writeLog("❌ Gagal membaca inbox.");
         document.getElementById('inboxView').value = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
         
-        var link = findLinkInString(data);
+        var link = findLinkInObject(data);
         if (link) {
           document.getElementById('manualLink').value = link;
-          writeLog("Link terdeteksi di dalam inbox!");
+          writeLog("Link terdeteksi!");
         } else {
-          writeLog("Inbox dimuat. Belum ada link verifikasi.");
+          writeLog("Inbox dimuat. Belum ada link.");
         }
       });
     }
 
-    // 3. PROSES DARI INBOX
     function handleProcessInbox() {
       var email = document.getElementById('activeEmail').value.trim();
-      if (!email) return alert("Harap isi atau buat email dulu!");
+      var provider = getProvider();
+      if (!email) return alert("Isi atau buat email terlebih dahulu!");
 
-      writeLog("Mengekstrak link dari inbox...");
-      apiFetch('/api/tempmail/1timetech?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
-        var link = findLinkInString(data);
+      writeLog("Mengekstrak link...");
+      apiFetch('/api/tempmail/' + provider + '?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
+        var link = findLinkInObject(data);
         if (!link) return writeLog("❌ Link belum terdeteksi. Silakan tekan 'CEK PESAN MASUK'.");
 
         document.getElementById('manualLink').value = link;
@@ -410,7 +428,6 @@
       });
     }
 
-    // 4. AKTIFKAN LINK MANUAL
     function handleExecuteManualLink() {
       var email = document.getElementById('activeEmail').value.trim();
       var link = document.getElementById('manualLink').value.trim();
@@ -425,11 +442,9 @@
       });
     }
 
-    // 5. COPY EMAIL
     function handleCopyEmail() {
       var emailInput = document.getElementById('activeEmail');
       if (!emailInput.value) return alert("Email kosong!");
-      
       emailInput.select();
       document.execCommand('copy');
       alert("Email berhasil di-copy!");
