@@ -1,8 +1,9 @@
+
 {
   "rewrites": [
     {
-      "source": "/api/am/:path*",
-      "destination": "https://api.alwayscodex.eu.cc/api/am/:path*"
+      "source": "/backend-api/:path*",
+      "destination": "https://api.alwayscodex.eu.cc/:path*"
     }
   ]
 }
