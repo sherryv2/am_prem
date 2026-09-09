@@ -211,7 +211,7 @@
 
   <script>
     var API_HOST = 'https://api.alwayscodex.eu.cc';
-    var currentEmailData = null; // Menyimpan data email & email_id dari tempamail
+    var globalEmailId = '';
 
     function writeLog(text) {
       var box = document.getElementById('consoleLog');
@@ -221,7 +221,6 @@
       }
     }
 
-    // Engine Request API Multi-Fallback
     function apiFetch(endpoint, callback) {
       var targetUrl = API_HOST + endpoint;
 
@@ -247,12 +246,20 @@
         });
     }
 
-    // Pemindai Link dari Response JSON TempAMail
+    function parseEmailResponse(data) {
+      var result = { email: '', id: '' };
+      if (typeof data === 'object' && data !== null) {
+        var obj = data.result || data;
+        result.email = obj.email || obj.address || '';
+        result.id = obj.email_id || obj.emailId || obj.id || '';
+      }
+      return result;
+    }
+
     function findLinkInObject(obj) {
       if (!obj) return null;
       var str = typeof obj === 'string' ? obj : JSON.stringify(obj);
 
-      // Bersihkan pemisah HTML dan escape backslash
       str = str.split('\\/').join('/')
                .split('\\"').join('"')
                .split('\\n').join(' ')
@@ -285,7 +292,6 @@
       document.getElementById('consoleLog').value = "[ PROSES DIMULAI VIA TEMPAMAIL ]";
       writeLog("Membuat email baru dari API tempamail...");
 
-      // Step 1: Create Email via tempamail
       apiFetch('/api/tempmail/tempamail?action=create', function(err1, data1) {
         if (err1) {
           writeLog("❌ Gagal terhubung ke API TempAMail.");
@@ -293,35 +299,24 @@
           return;
         }
 
-        currentEmailData = data1;
-        var newEmail = null;
-        var emailId = null;
-
-        if (typeof data1 === 'object' && data1 !== null) {
-          if (data1.result) {
-            newEmail = data1.result.email || data1.result.address;
-            emailId = data1.result.email_id || data1.result.id;
-          } else {
-            newEmail = data1.email;
-            emailId = data1.email_id || data1.id;
-          }
-        }
-
-        if (!newEmail) {
-          writeLog("❌ Gagal mendapatkan email baru.");
+        var parsed = parseEmailResponse(data1);
+        if (!parsed.email || !parsed.id) {
+          writeLog("❌ Gagal mendaptkan email/email_id dari server.");
           resetStartButton();
           return;
         }
 
-        emailInput.value = newEmail;
-        writeLog("[1/4] Email berhasil dibuat: " + newEmail);
+        globalEmailId = parsed.id;
+        emailInput.value = parsed.email;
+        emailInput.setAttribute('data-email-id', parsed.id);
+        writeLog("[1/4] Email berhasil dibuat: " + parsed.email);
 
         // Step 2: Kirim Link Verifikasi
         writeLog("[2/4] Mengirim request verifikasi ke Alight Motion...");
-        apiFetch('/api/am/sendv2?email=' + encodeURIComponent(newEmail), function(err2, data2) {
-          writeLog("[2/4] Request verifikasi terkirim ke email!");
+        apiFetch('/api/am/sendv2?email=' + encodeURIComponent(parsed.email), function(err2, data2) {
+          writeLog("[2/4] Request verifikasi terkirim!");
 
-          // Step 3: Cek Inbox Berulang (8x)
+          // Step 3: Cek Inbox (Wajib sertakan email_id)
           writeLog("[3/4] Menunggu pesan di inbox...");
           var attempts = 0;
           var maxAttempts = 8;
@@ -330,10 +325,7 @@
             attempts++;
             writeLog("[3/4] Mengecek inbox (" + attempts + "/" + maxAttempts + ")...");
 
-            var inboxEndpoint = '/api/tempmail/tempamail?action=inbox&email=' + encodeURIComponent(newEmail);
-            if (emailId) {
-              inboxEndpoint += '&email_id=' + encodeURIComponent(emailId);
-            }
+            var inboxEndpoint = '/api/tempmail/tempamail?action=inbox&email_id=' + encodeURIComponent(globalEmailId);
 
             apiFetch(inboxEndpoint, function(errInbox, dataInbox) {
               if (dataInbox) {
@@ -348,7 +340,7 @@
 
                   // Step 4: Eksekusi Aktivasi
                   writeLog("[4/4] Memproses aktivasi Premium...");
-                  apiFetch('/api/am/verifv2?email=' + encodeURIComponent(newEmail) + '&link=' + encodeURIComponent(foundLink), function(errVerif, dataVerif) {
+                  apiFetch('/api/am/verifv2?email=' + encodeURIComponent(parsed.email) + '&link=' + encodeURIComponent(foundLink), function(errVerif, dataVerif) {
                     writeLog("==========================================");
                     writeLog("🎉 SUKSES! AKUN PREMIUM BERHASIL AKTIF!");
                     writeLog("==========================================");
@@ -377,11 +369,13 @@
 
     // 2. CEK INBOX MANUAL
     function handleCheckInbox() {
-      var email = document.getElementById('activeEmail').value.trim();
-      if (!email) return alert("Harap isi atau buat email dulu!");
+      var emailInput = document.getElementById('activeEmail');
+      var emailId = globalEmailId || emailInput.getAttribute('data-email-id');
+
+      if (!emailId) return alert("Belum ada email_id! Klik 'BUAT & AKTIFKAN AKUN' terlebih dahulu.");
 
       writeLog("Mengecek inbox TempAMail...");
-      apiFetch('/api/tempmail/tempamail?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
+      apiFetch('/api/tempmail/tempamail?action=inbox&email_id=' + encodeURIComponent(emailId), function(err, data) {
         if (err) return writeLog("❌ Gagal membaca inbox.");
         document.getElementById('inboxView').value = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
 
@@ -397,11 +391,14 @@
 
     // 3. PROSES DARI INBOX
     function handleProcessInbox() {
-      var email = document.getElementById('activeEmail').value.trim();
-      if (!email) return alert("Harap isi atau buat email dulu!");
+      var emailInput = document.getElementById('activeEmail');
+      var email = emailInput.value.trim();
+      var emailId = globalEmailId || emailInput.getAttribute('data-email-id');
+
+      if (!emailId || !email) return alert("Belum ada email_id! Klik 'BUAT & AKTIFKAN AKUN' terlebih dahulu.");
 
       writeLog("Mengekstrak link dari inbox...");
-      apiFetch('/api/tempmail/tempamail?action=inbox&email=' + encodeURIComponent(email), function(err, data) {
+      apiFetch('/api/tempmail/tempamail?action=inbox&email_id=' + encodeURIComponent(emailId), function(err, data) {
         var link = findLinkInObject(data);
         if (!link) return writeLog("❌ Link belum terdeteksi. Silakan tekan 'CEK PESAN MASUK'.");
 
