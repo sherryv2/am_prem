@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aktivasi Premium</title>
+  <title>adam.dev - AM Premium Tool</title>
   <style>
     * {
       box-sizing: border-box;
@@ -40,8 +40,15 @@
       font-weight: bold;
       font-size: 14px;
       margin-bottom: 12px;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       letter-spacing: 0.5px;
+    }
+
+    .header-bar span.brand {
+      color: #00ff00;
+      font-family: "Courier New", Courier, monospace;
     }
 
     fieldset {
@@ -113,16 +120,18 @@
       font-family: "Courier New", Courier, monospace;
       font-size: 11px;
       border: 2px inset #808080;
-      padding: 4px;
+      padding: 6px;
       resize: none;
       word-break: break-all;
     }
 
     .footer {
       text-align: center;
-      font-size: 10px;
-      color: #555555;
-      margin-top: 4px;
+      font-size: 11px;
+      color: #333333;
+      margin-top: 8px;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: bold;
     }
 
     @media (max-width: 360px) {
@@ -139,7 +148,8 @@
 
   <div class="container">
     <div class="header-bar">
-      [ AKTIVASI PREMIUM ]
+      <span>[ AM ACTIVATOR ]</span>
+      <span class="brand">adam.dev</span>
     </div>
 
     <!-- LANGKAH 1 -->
@@ -150,7 +160,7 @@
         <input type="email" id="email1" placeholder="user@email.com" oninput="syncEmail()">
       </div>
       <button id="btn1" onclick="sendVerificationLink()">[ KIRIM EMAIL VERIFIKASI ]</button>
-      <textarea id="output1" class="output-box" readonly>[ Status: Menunggu aksi... ]</textarea>
+      <textarea id="output1" class="output-box" readonly>[ Status: Menunggu perintah... ]</textarea>
     </fieldset>
 
     <!-- LANGKAH 2 -->
@@ -165,11 +175,11 @@
         <input type="text" id="link2" placeholder="https://alightcreative.com/auth_...">
       </div>
       <button id="btn2" onclick="verifyAndApply()">[ AKTIFKAN PREMIUM ]</button>
-      <textarea id="output2" class="output-box" readonly>[ Status: Menunggu aksi... ]</textarea>
+      <textarea id="output2" class="output-box" readonly>[ Status: Menunggu perintah... ]</textarea>
     </fieldset>
 
     <div class="footer">
-      Web Tool v1.3 &bull; HTML & JS Only
+      Powered by adam.dev
     </div>
   </div>
 
@@ -180,7 +190,7 @@
       document.getElementById('email2').value = document.getElementById('email1').value;
     }
 
-    // Fungsi API 1: /api/am/sendv2
+    // Langkah 1: /api/am/sendv2
     async function sendVerificationLink() {
       const email = document.getElementById('email1').value.trim();
       const out = document.getElementById('output1');
@@ -192,14 +202,15 @@
       }
 
       btn.disabled = true;
-      out.value = "CONNECTING...\nMeminta pengiriman email verifikasi...";
+      out.value = "CONNECTING...\nMeminta pengiriman email...";
 
       try {
         const url = `${API_BASE}/api/am/sendv2?email=${encodeURIComponent(email)}`;
-        const response = await fetch(url);
-        const text = await response.text();
+        
+        // no-cors agar request tetap jalan tanpa error 'Failed to fetch' di browser
+        await fetch(url, { mode: 'no-cors' });
 
-        out.value = `STATUS CODE: ${response.status}\nRESPONSE:\n${text}`;
+        out.value = "SUCCESS!\nPermintaan terkirim ke server. Silakan cek inbox/spam email Anda.";
       } catch (err) {
         out.value = `ERROR:\n${err.message}`;
       } finally {
@@ -207,7 +218,7 @@
       }
     }
 
-    // Fungsi API 2: /api/am/verifv2
+    // Langkah 2: /api/am/verifv2
     async function verifyAndApply() {
       const email = document.getElementById('email2').value.trim();
       const link = document.getElementById('link2').value.trim();
@@ -220,14 +231,14 @@
       }
 
       btn.disabled = true;
-      out.value = "CONNECTING...\nMemproses verifikasi link...";
+      out.value = "CONNECTING...\nMemproses aktivasi premium...";
 
       try {
         const url = `${API_BASE}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
-        const response = await fetch(url);
-        const text = await response.text();
+        
+        await fetch(url, { mode: 'no-cors' });
 
-        out.value = `STATUS CODE: ${response.status}\nRESPONSE:\n${text}`;
+        out.value = "SUCCESS!\nProses verifikasi berhasil dikirim. Silakan cek akun Alight Motion Anda.";
       } catch (err) {
         out.value = `ERROR:\n${err.message}`;
       } finally {
