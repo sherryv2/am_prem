@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aktivasi Alight Motion Premium</title>
+  <title>Aktivasi Premium</title>
   <style>
     * {
       box-sizing: border-box;
@@ -118,22 +118,6 @@
       word-break: break-all;
     }
 
-    .proxy-option {
-      background-color: #ffffff;
-      border: 1px solid #808080;
-      padding: 6px 8px;
-      margin-bottom: 12px;
-      font-size: 11px;
-    }
-
-    .proxy-option label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: normal;
-      cursor: pointer;
-    }
-
     .footer {
       text-align: center;
       font-size: 10px;
@@ -141,7 +125,6 @@
       margin-top: 4px;
     }
 
-    /* Responsif untuk Layar Sangat Kecil (Mobile) */
     @media (max-width: 360px) {
       body {
         padding: 4px;
@@ -157,14 +140,6 @@
   <div class="container">
     <div class="header-bar">
       [ AKTIVASI PREMIUM ]
-    </div>
-
-    <!-- Opsi Penembus CORS jika gagal -->
-    <div class="proxy-option">
-      <label>
-        <input type="checkbox" id="useProxy" checked>
-        <strong>Gunakan CORS Proxy</strong> (Centang jika dapat error 'Failed')
-      </label>
     </div>
 
     <!-- LANGKAH 1 -->
@@ -194,56 +169,15 @@
     </fieldset>
 
     <div class="footer">
-      Web Tool v1.2 &bull; HTML & JS Only
+      Web Tool v1.3 &bull; HTML & JS Only
     </div>
   </div>
 
   <script>
     const API_BASE = 'https://api.alwayscodex.eu.cc';
 
-    // Otomatis samakan email di langkah 1 ke langkah 2
     function syncEmail() {
       document.getElementById('email2').value = document.getElementById('email1').value;
-    }
-
-    // Helper untuk memanggil API dengan penanganan CORS Proxy & Fallback
-    async function callApi(endpoint, params) {
-      const useProxy = document.getElementById('useProxy').checked;
-      const queryStr = new URLSearchParams(params).toString();
-      const targetUrl = `${API_BASE}${endpoint}?${queryStr}`;
-
-      // Tentukan URL yang dipanggil (Pakai Proxy atau Langsung)
-      let fetchUrl = useProxy 
-        ? `https://corsproxy.io/?${encodeURIComponent(targetUrl)}` 
-        : targetUrl;
-
-      try {
-        let response = await fetch(fetchUrl);
-        let text = await response.text();
-
-        return {
-          ok: response.ok,
-          status: response.status,
-          data: text
-        };
-      } catch (err) {
-        // Jika pemanggilan langsung gagal, coba otomatis fallback menggunakan Proxy
-        if (!useProxy) {
-          try {
-            let proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-            let response = await fetch(proxyUrl);
-            let text = await response.text();
-            return {
-              ok: response.ok,
-              status: response.status,
-              data: text + "\n(Berhasil diproses via Proxy Fallback)"
-            };
-          } catch (proxyErr) {
-            throw new Error("Gagal terhubung ke API. Periksa jaringan Anda.");
-          }
-        }
-        throw err;
-      }
     }
 
     // Fungsi API 1: /api/am/sendv2
@@ -261,10 +195,13 @@
       out.value = "CONNECTING...\nMeminta pengiriman email verifikasi...";
 
       try {
-        const res = await callApi('/api/am/sendv2', { email: email });
-        out.value = `STATUS CODE: ${res.status}\nRESPONSE:\n${res.data}`;
+        const url = `${API_BASE}/api/am/sendv2?email=${encodeURIComponent(email)}`;
+        const response = await fetch(url);
+        const text = await response.text();
+
+        out.value = `STATUS CODE: ${response.status}\nRESPONSE:\n${text}`;
       } catch (err) {
-        out.value = `ERROR:\n${err.message}\n\nTips: Pastikan centang 'Gunakan CORS Proxy' tetap aktif.`;
+        out.value = `ERROR:\n${err.message}`;
       } finally {
         btn.disabled = false;
       }
@@ -286,10 +223,13 @@
       out.value = "CONNECTING...\nMemproses verifikasi link...";
 
       try {
-        const res = await callApi('/api/am/verifv2', { email: email, link: link });
-        out.value = `STATUS CODE: ${res.status}\nRESPONSE:\n${res.data}`;
+        const url = `${API_BASE}/api/am/verifv2?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}`;
+        const response = await fetch(url);
+        const text = await response.text();
+
+        out.value = `STATUS CODE: ${response.status}\nRESPONSE:\n${text}`;
       } catch (err) {
-        out.value = `ERROR:\n${err.message}\n\nTips: Pastikan centang 'Gunakan CORS Proxy' tetap aktif.`;
+        out.value = `ERROR:\n${err.message}`;
       } finally {
         btn.disabled = false;
       }
