@@ -126,7 +126,7 @@
 
     .output-box {
       width: 100%;
-      height: 110px;
+      height: 120px;
       margin-top: 4px;
       background-color: #000000;
       color: #00ff00;
@@ -140,7 +140,7 @@
 
     .inbox-box {
       width: 100%;
-      height: 90px;
+      height: 80px;
       margin-top: 4px;
       background-color: #ffffff;
       color: #000000;
@@ -152,12 +152,6 @@
       word-break: break-all;
     }
 
-    .status-badge {
-      font-weight: bold;
-      color: #008000;
-      font-size: 12px;
-    }
-
     .footer {
       text-align: center;
       font-size: 11px;
@@ -165,11 +159,6 @@
       margin-top: 6px;
       font-family: "Courier New", Courier, monospace;
       font-weight: bold;
-    }
-
-    @media (max-width: 360px) {
-      body { padding: 4px; }
-      .container { padding: 6px; }
     }
   </style>
 </head>
@@ -183,13 +172,13 @@
 
     <!-- 1-CLICK AUTOMATION -->
     <fieldset>
-      <legend>1-Click Auto Generate & Premium</legend>
+      <legend>Otomatisasi 1-Klik</legend>
       <button id="btnStart" class="btn-main" onclick="startFullAutomation()">[ 🚀 BUAT & AKTIFKAN AKUN ]</button>
     </fieldset>
 
-    <!-- HASIL AKUN -->
+    <!-- DETAIL AKUN -->
     <fieldset>
-      <legend>Detail Akun Teraktifkan</legend>
+      <legend>Detail Akun Terbuat</legend>
       <div class="form-group">
         <label for="activeEmail">EMAIL AKUN AM PREMIUM:</label>
         <input type="email" id="activeEmail" placeholder="Belum ada akun terbuat..." readonly>
@@ -197,17 +186,17 @@
       <button id="btnCopy" class="btn-secondary" onclick="copyEmail()" disabled>[ 📋 COPY EMAIL ]</button>
     </fieldset>
 
-    <!-- AKSES INBOX UNTUK LOGIN LATER -->
+    <!-- INBOX VIEW -->
     <fieldset>
-      <legend>Akses Inbox (Untuk Minta Link Login)</legend>
-      <button id="btnCheckInbox" class="btn-secondary" onclick="checkInboxManual()" disabled>[ 📥 CEK INBOX PESAN MASUK ]</button>
-      <textarea id="inboxView" class="inbox-box" readonly>[ Klik tombol 'CEK INBOX' untuk membaca email masuk... ]</textarea>
+      <legend>Akses Inbox Email (Minta Login)</legend>
+      <button id="btnCheckInbox" class="btn-secondary" onclick="checkInboxManual()" disabled>[ 📥 CEK PESAN MASUK ]</button>
+      <textarea id="inboxView" class="inbox-box" readonly>[ Klik 'CEK PESAN MASUK' untuk membaca email... ]</textarea>
     </fieldset>
 
-    <!-- CONSOLE LOG -->
+    <!-- LOG CONSOLE -->
     <fieldset>
-      <legend>Live Console Log</legend>
-      <textarea id="consoleLog" class="output-box" readonly>[ Siap. Klik 'BUAT & AKTIFKAN AKUN' untuk mulai otomatisasi. ]</textarea>
+      <legend>Console Log</legend>
+      <textarea id="consoleLog" class="output-box" readonly>[ Ready. Klik 'BUAT & AKTIFKAN AKUN' untuk mulai. ]</textarea>
     </fieldset>
 
     <div class="footer">
@@ -216,7 +205,10 @@
   </div>
 
   <script>
-    const API_BASE = 'https://api.alwayscodex.eu.cc';
+    // Memakai Vercel Rewrite Proxy (/backend-api) agar bebas CORS
+    const PROXY_BASE = window.location.hostname.includes('vercel.app') 
+      ? '/backend-api' 
+      : 'https://api.alwayscodex.eu.cc';
 
     function log(msg) {
       const consoleBox = document.getElementById('consoleLog');
@@ -224,59 +216,28 @@
       consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    // Helper panggil API dengan multi-proxy fallback agar anti CORS/Blocked di Vercel
-    async function fetchApiRobust(url) {
-      // 1. Direct Fetch
-      try {
-        let res = await fetch(url);
-        if (res.ok) {
-          let text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
-        }
-      } catch (e) {}
-
-      // 2. Proxy Fallback 1: corsproxy.io
-      try {
-        let proxy1 = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-        let res = await fetch(proxy1);
-        if (res.ok) {
-          let text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
-        }
-      } catch (e) {}
-
-      // 3. Proxy Fallback 2: allorigins
-      try {
-        let proxy2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        let res = await fetch(proxy2);
-        if (res.ok) {
-          let text = await res.text();
-          try { return JSON.parse(text); } catch(e) { return text; }
-        }
-      } catch (e) {}
-
-      throw new Error("Gagal mengambil data dari server API.");
-    }
-
-    // PROSES OTOMATISASI UTAMA
     async function startFullAutomation() {
       const btn = document.getElementById('btnStart');
       const emailInput = document.getElementById('activeEmail');
       const consoleBox = document.getElementById('consoleLog');
 
       btn.disabled = true;
-      consoleBox.value = "[ MENGAWALI PROSES OTOMATISASI... ]";
+      consoleBox.value = "[ MEMULAI PROSES... ]";
       emailInput.value = "";
 
       try {
-        // STEP 1: Buat Temp Email
-        log("[1/4] Membuat email temporary baru...");
-        const createUrl = `${API_BASE}/api/tempmail/1timetech?action=create`;
-        const mailData = await fetchApiRobust(createUrl);
+        // STEP 1: Create Email
+        log("[1/4] Membuat temp email...");
+        const createUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=create`;
+        
+        const res1 = await fetch(createUrl);
+        const data1 = await res1.json();
 
-        let createdEmail = extractEmail(mailData);
+        // Mengambil email berdasarkan skema JSON: data1.result.email
+        let createdEmail = data1.result ? data1.result.email : null;
+
         if (!createdEmail) {
-          throw new Error("Server tidak mengembalikan email valid. Coba lagi.");
+          throw new Error("Gagal mengambil email dari response API.");
         }
 
         emailInput.value = createdEmail;
@@ -285,56 +246,52 @@
 
         log(`[1/4] Email berhasil dibuat: ${createdEmail}`);
 
-        // STEP 2: Kirim Link Verifikasi Alight Motion
-        log("[2/4] Mengirim request verifikasi ke Alight Motion...");
-        const sendUrl = `${API_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`;
-        await fetch(sendUrl, { mode: 'no-cors' });
-        log("[2/4] Link verifikasi berhasil dikirim.");
+        // STEP 2: Send Link
+        log("[2/4] Mengirim request link verifikasi ke Alight Motion...");
+        const sendUrl = `${PROXY_BASE}/api/am/sendv2?email=${encodeURIComponent(createdEmail)}`;
+        await fetch(sendUrl);
+        log("[2/4] Request berhasil dikirim.");
 
-        // STEP 3: Auto Polling Inbox (Menunggu Email Masuk)
-        log("[3/4] Menunggu email masuk di inbox (otomatis mengecek setiap 3 detik)...");
-        
+        // STEP 3: Poll Inbox
+        log("[3/4] Menunggu email masuk (auto-check setiap 3 detik)...");
         let foundLink = null;
         let attempts = 0;
-        const maxAttempts = 12; // Coba selama ~36 detik
 
-        while (attempts < maxAttempts && !foundLink) {
+        while (attempts < 10 && !foundLink) {
           attempts++;
-          await new Promise(r => setTimeout(r, 3000)); // Delay 3 detik
+          await new Promise(r => setTimeout(r, 3000));
 
           try {
-            const inboxUrl = `${API_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`;
-            const inboxData = await fetchApiRobust(inboxUrl);
-            const inboxStr = JSON.stringify(inboxData);
+            const inboxUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(createdEmail)}`;
+            const resInbox = await fetch(inboxUrl);
+            const dataInbox = await resInbox.json();
 
-            // Regex cari link alightcreative/auth
-            const linkMatch = inboxStr.match(/https?:\/\/[^\s"'\\]*alight[^\s"'\\]*/i) || 
-                              inboxStr.match(/https?:\/\/[^\s"'\\]+auth[^\s"'\\]*/i);
+            const str = JSON.stringify(dataInbox);
+            const match = str.match(/https?:\/\/[^\s"'\\]*(alight|auth)[^\s"'\\]*/i);
 
-            if (linkMatch) {
-              foundLink = linkMatch[0].replace(/\\/g, '');
+            if (match) {
+              foundLink = match[0].replace(/\\/g, '');
               log(`[3/4] Link verifikasi ditemukan!`);
             } else {
-              log(`[3/4] Pengecekan ke-${attempts}... email belum tiba.`);
+              log(`[3/4] Pengecekan ke-${attempts}... belum ada pesan.`);
             }
           } catch (e) {
-            log(`[3/4] Pengecekan ke-${attempts}... mengulang.`);
+            log(`[3/4] Mengulang pengecekan ke-${attempts}...`);
           }
         }
 
         if (!foundLink) {
-          throw new Error("Waktu habis! Email verifikasi tidak ditemukan di inbox.");
+          throw new Error("Pesan dari Alight Motion belum masuk. Silakan coba cek inbox manual nanti.");
         }
 
-        // STEP 4: Eksekusi Verifikasi Premium
-        log("[4/4] Memproses verifikasi & aktivasi Premium...");
-        const verifUrl = `${API_BASE}/api/am/verifv2?email=${encodeURIComponent(createdEmail)}&link=${encodeURIComponent(foundLink)}`;
-        await fetch(verifUrl, { mode: 'no-cors' });
+        // STEP 4: Activate
+        log("[4/4] Memproses aktivasi Premium...");
+        const verifUrl = `${PROXY_BASE}/api/am/verifv2?email=${encodeURIComponent(createdEmail)}&link=${encodeURIComponent(foundLink)}`;
+        await fetch(verifUrl);
 
-        log("----------------------------------------");
-        log("🎉 SELESAI! AKUN AM PREMIUM AKTIFF!");
-        log("Simpan email di atas. Kamu bisa gunakan fitur Cek Inbox untuk minta link login entar.");
-        log("----------------------------------------");
+        log("==========================================");
+        log("🎉 SUKSES! Akun Premium Berhasil Aktif!");
+        log("==========================================");
 
       } catch (err) {
         log(`❌ ERROR: ${err.message}`);
@@ -343,51 +300,28 @@
       }
     }
 
-    // FUNGSI AKSES INBOX UNTUK MINTA LINK LOGIN NANTI
     async function checkInboxManual() {
       const email = document.getElementById('activeEmail').value.trim();
       const inboxView = document.getElementById('inboxView');
 
-      if (!email) return alert("Belum ada email yang dibuat!");
+      if (!email) return alert("Belum ada email!");
 
-      inboxView.value = "Mengecek inbox...";
-      log("Memeriksa pesan inbox terbaru...");
-
+      inboxView.value = "Memuat inbox...";
       try {
-        const inboxUrl = `${API_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`;
-        const inboxData = await fetchApiRobust(inboxUrl);
-
-        inboxView.value = typeof inboxData === 'object' ? JSON.stringify(inboxData, null, 2) : inboxData;
-        log("Pesan inbox berhasil dimuat.");
+        const inboxUrl = `${PROXY_BASE}/api/tempmail/1timetech?action=inbox&email=${encodeURIComponent(email)}`;
+        const res = await fetch(inboxUrl);
+        const data = await res.json();
+        inboxView.value = JSON.stringify(data, null, 2);
       } catch (err) {
-        inboxView.value = "Gagal memuat inbox.";
-        log(`Error inbox: ${err.message}`);
+        inboxView.value = "Gagal memuat pesan inbox.";
       }
-    }
-
-    // Helper ekstraksi email dari berbagai format JSON
-    function extractEmail(data) {
-      if (typeof data === 'string') {
-        const match = data.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-        if (match) return match[0];
-      }
-      if (typeof data === 'object' && data !== null) {
-        if (data.email) return data.email;
-        if (data.result) return extractEmail(data.result);
-        const str = JSON.stringify(data);
-        const match = str.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-        if (match) return match[0];
-      }
-      return null;
     }
 
     function copyEmail() {
       const emailInput = document.getElementById('activeEmail');
-      if (!emailInput.value) return;
       navigator.clipboard.writeText(emailInput.value);
       alert("Email berhasil di-copy!");
     }
   </script>
-
 </body>
 </html>
